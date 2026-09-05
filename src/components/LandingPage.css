@@ -1,0 +1,376 @@
+.app-shell button,
+.app-shell input {
+  font: inherit;
+}
+
+.app-shell {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  overflow: hidden;
+  padding: 32px 18px;
+  background-image: url('/backgrounds/landing.png');
+  background-size: 100% 100%;
+  background-position: center;
+  color: #f8fafc;
+  position: relative;
+}
+
+/* How To Play Button */
+.how-to-play-btn {
+  position: absolute;
+  top: 1.5rem;
+  left: 1.5rem;
+  width: 250px;
+  height: auto;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  z-index: 50;
+  transition: transform 0.2s ease-in-out, filter 0.2s ease-in-out;
+  padding: 0;  
+  filter: drop-shadow(0 0 20px rgba(255, 255, 255, 1));
+}
+
+.how-to-play-btn:hover {
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 15px rgba(56, 189, 248, 0.6));
+}
+
+.how-to-play-btn img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+/* Landing Loop Video Container */
+.landing-loop-video-container {
+  position: absolute;
+  bottom: 7rem;
+  left: 1rem;
+  width: 42vw;
+  z-index: 10;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  pointer-events: none;
+}
+
+.landing-loop-video {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+
+/* Full screen Video Overlay */
+.landing-video-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease-out; /* Tiny crossfade avoids single-frame harsh cuts */
+  background-color: #000;
+}
+
+.landing-video-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.landing-video {
+  width: 100vw;
+  height: 100vh;
+  object-fit: fill; /* Forces video to match background-size: 100% 100% */
+  background-color: transparent;
+}
+
+.entry-card {
+  width: min(920px, 100%);
+  padding: clamp(24px, 4vw, 42px);
+  transform: translate(15vw, 19vh); /* Shifts the card left 20% of screen width and down 20% of screen height */
+  z-index: 20; /* Ensures it stays above the new background video loop */
+}
+
+.content-area {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 18px;
+  align-items: stretch;
+}
+
+.player-list {
+  display: grid;
+  gap: 4px;
+}
+
+.player-row {
+  display: grid;
+  grid-template-columns: 76px minmax(200px, 1fr) minmax(260px, 1.2fr);
+  gap: 10px;
+  align-items: center;
+  padding: 4px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  background: rgba(10, 10, 10, 1);
+}
+
+.ninja-avatar-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  height: 90px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.32);
+  box-shadow:
+    inset 0 2px 6px rgba(0, 0, 0, 0.6),
+    0 2px 0 rgba(255, 255, 255, 0.08);
+  padding: 0px;
+  transition: transform 200ms ease, background-color 200ms ease;
+}
+
+.ninja-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5));
+  transition: transform 200ms ease;
+}
+
+.player-row:hover .ninja-avatar-container {
+  transform: scale(1.04);
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.name-field {
+  display: grid;
+  gap: 8px;
+}
+
+.name-field input {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 14px;
+  outline: none;
+  padding: 14px 16px;
+  color: #ffffff;
+  font-family: var(--font-julee);
+  font-size: 36px;
+  background: rgba(127, 0, 255, .6);
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.name-field input::placeholder {
+  color: #8f9db4;
+}
+
+.name-field input:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.16);
+  transform: translateY(-1px);
+}
+
+.color-picker {
+  min-width: 0;
+  margin: 0;
+  border: 0;
+  padding: 0;
+}
+
+.swatch-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(34px, 1fr));
+  gap: 10px;
+}
+
+.color-swatch {
+  position: relative;
+  min-height: 40px;
+  cursor: pointer;
+  width: 40px;
+  border: 2px solid rgba(255, 255, 255, 0.22);
+  border-radius: 36px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.34), transparent 38%),
+    var(--swatch-color);
+  box-shadow: inset 0 -10px 16px rgba(0, 0, 0, 0.18);
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+.color-swatch:hover,
+.color-swatch:focus-visible {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.86);
+  outline: none;
+}
+
+.color-swatch.selected {
+  border-color: #ffffff;
+  box-shadow:
+    0 0 0 4px rgba(255, 255, 255, 0.18),
+    0 14px 28px rgba(0, 0, 0, 0.22);
+  transform: translateY(-2px) scale(1.02);
+}
+
+.color-swatch.selected::after {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  display: grid;
+  place-items: center;
+  width: 12px;
+  height: 12px;
+  border: 2px solid #ffffff;
+  border-radius: 999px;
+  color: #ffffff;
+  content: "";
+  transform: translate(-50%, -50%);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+}
+
+.color-swatch.taken {
+  cursor: not-allowed;
+  opacity: 0.3;
+  filter: grayscale(0.6);
+}
+
+.color-swatch.taken:hover {
+  transform: none;
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.start-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+  transition: transform 180ms ease;
+}
+
+.start-button img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.4));
+  transition: filter 180ms ease;
+}
+
+.start-button:not(:disabled):hover img {
+  filter: drop-shadow(0 8px 25px rgba(56, 189, 248, 0.6));
+}
+
+.start-button:not(:disabled):hover {
+  transform: translateX(4px) scale(1.02);
+}
+
+.start-button:not(:disabled):active {
+  transform: translateX(0) scale(0.96);
+}
+
+.start-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  filter: grayscale(100%);
+}
+ 
+.start-actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.settings-columns {
+  display: flex;
+  gap: 12px;
+}
+
+.toggles-col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.length-toggle {
+  background: transparent;
+  border: 2px solid transparent;
+  cursor: pointer;
+  border-radius: 12px;
+  padding: 4px;
+  transition: all 0.2s ease;
+  opacity: 0.5;
+  filter: grayscale(80%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.length-toggle img {
+  width: 150px;
+  height: auto;
+  object-fit: contain;
+}
+
+.length-toggle:hover {
+  transform: scale(1.05);
+  opacity: 0.8;
+  filter: grayscale(40%);
+}
+
+.length-toggle.selected { 
+  opacity: 1;
+  filter: grayscale(0%);
+  transform: scale(1.1); 
+}
+
+@media (max-width: 720px) {
+  .start-actions {
+    flex-direction: column;
+  }
+  .toggles-col {
+    flex-direction: row;
+  }
+  .entry-card {
+    border-radius: 24px;
+  }
+  .content-area {
+    grid-template-columns: 1fr auto;
+  }
+  .player-row {
+    grid-template-columns: 76px 1fr;
+    align-items: center;
+  }
+  .color-picker {
+    grid-column: 1 / -1;
+    margin-top: 6px;
+  }
+  .start-button {
+    width: 52px;
+  }
+}
+
+@media (max-width: 440px) {
+  .swatch-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .start-button {
+    width: 44px;
+  }
+  .start-button span {
+    font-size: 0.85rem;
+  }
+}

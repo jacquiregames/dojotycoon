@@ -1,0 +1,53 @@
+@keyframes pop-in {
+  from {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.tier-display-container {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tier-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: rotate(-90deg); /* Start the progress from the top */
+}
+
+.tier-circle-bg,
+.tier-circle-progress {
+  fill: none;
+  stroke-width: 10;
+}
+
+.tier-circle-bg {
+  stroke: rgba(16, 185, 129, 0.1);
+}
+
+.tier-circle-progress {
+  stroke: #00ff95;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.5s ease-out;
+  filter: drop-shadow(0 0 3px #00ff95);
+}
+
+.tier-number {
+  font-family: var(--font-mono);
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: #caffec;
+  text-shadow: 0 0 5px rgba(0, 255, 149, 0.7);
+  z-index: 2;
+}
+

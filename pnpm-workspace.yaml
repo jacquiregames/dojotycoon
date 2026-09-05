@@ -1,0 +1,12 @@
+allowBuilds:
+  better-sqlite3: true
+  esbuild: true
+  protobufjs: true
+
+ignoredBuiltDependencies:
+  - better-sqlite3
+  - protobufjs
+
+onlyBuiltDependencies:
+  - esbuild
+ 

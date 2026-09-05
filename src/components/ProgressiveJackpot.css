@@ -1,0 +1,314 @@
+/* src/components/ProgressiveJackpot.css */
+
+@property --angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.jackpot-overlay {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none; /* Lets clicks pass through the invisible background */
+  z-index: 250; /* Sits above CardRandomizer */
+}
+
+/* ==================== MODAL ==================== */
+.jackpot-overlay .modal {
+  position: absolute;
+  top: 3vh;
+  right: 2vw;
+  width: 21.8vw;
+  height: 21.8vh;
+  min-width: 260px;
+  min-height: 380px;
+  border-radius: 22px;
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  color: #fff;
+  z-index: 10;
+  pointer-events: auto; /* Re-enable pointer events for the modal itself */
+
+  background: linear-gradient(160deg, rgba(20, 8, 40, 0.95) 0%, rgba(50, 10, 60, 0.95) 50%, rgba(10, 5, 30, 0.98) 100%);
+  border: 6px solid white;
+  background-clip: padding-box;
+  box-shadow:
+    0 0 0 1px rgba(255, 215, 0, 0.35),
+    0 0 40px rgba(255, 60, 180, 0.55),
+    0 0 80px rgba(120, 60, 255, 0.55),
+    inset 0 0 30px rgba(255, 215, 0, 0.08);
+}
+
+.jackpot-overlay .modal::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 22px;
+  padding: 2px;
+  background: conic-gradient(from var(--angle), #ffd700, #ff3ea5, #7a4dff, #00e5ff, #ffd700);
+  animation: spin-gradient 6s linear infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.jackpot-overlay .bulbs {
+  position: absolute;
+  inset: 6px;
+  border-radius: 18px;
+  pointer-events: none;
+  z-index: 2;
+  background:
+    radial-gradient(circle at 10px 10px, #fff5a0 3px, transparent 4px) 0 0 / 22px 22px repeat-x,
+    radial-gradient(circle at 10px 10px, #fff5a0 3px, transparent 4px) 0 100% / 22px 22px repeat-x,
+    radial-gradient(circle at 10px 10px, #fff5a0 3px, transparent 4px) 0 0 / 22px 22px repeat-y,
+    radial-gradient(circle at 10px 10px, #fff5a0 3px, transparent 4px) 100% 0 / 22px 22px repeat-y;
+  filter: drop-shadow(0 0 4px #ffd23a) drop-shadow(0 0 8px #ff8f2e);
+  animation: bulbBlink 1.2s steps(2) infinite;
+  opacity: 0.85;
+}
+
+@keyframes bulbBlink {
+  0% { opacity: 0.55; }
+  50% { opacity: 1; }
+  100% { opacity: 0.55; }
+}
+
+@keyframes spin-gradient {
+  to { --angle: 360deg; }
+}
+
+.jackpot-overlay .modal-inner {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.jackpot-overlay .header {
+  text-align: center;
+  padding: 4px 0 1px;
+}
+
+.jackpot-overlay .title {
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  background: linear-gradient(180deg, #fff6b0 0%, #ffb400 50%, #a05500 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 2px 0 rgba(0,0,0,0.4);
+  margin-top: 2px;
+}
+
+.jackpot-overlay .display {
+  width: 90%;
+  padding: 18px 10px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #000 0%, #0b0b1a 100%);
+  border: 3px solid #1a1a2e;
+  box-shadow: inset 0 0 20px rgba(0, 255, 200, 0.15), inset 0 0 4px rgba(255,255,255,0.1), 0 4px 12px rgba(0,0,0,0.6);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.jackpot-overlay .display::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.02) 1px, transparent 1px, transparent 3px);
+  pointer-events: none;
+}
+
+.jackpot-overlay .dollar-sign {
+  font-family: 'Courier New', monospace;
+  font-size: 50px;
+  color: #7cffb3;
+  vertical-align: top;
+  text-shadow: 0 0 10px #00ff88, 0 0 20px #00ff88;
+  margin-right: 4px;
+}
+
+.jackpot-overlay .total {
+  font-family: 'Courier New', monospace;
+  font-size: 52px;
+  font-weight: 900;
+  color: #7cffb3;
+  text-shadow: 0 0 8px #00ff88, 0 0 18px #00ff88, 0 0 30px rgba(0,255,136,0.6);
+  letter-spacing: 3px;
+  display: inline-block;
+  transition: transform 0.15s ease;
+}
+
+.jackpot-overlay .total.bump {
+  animation: bump 0.35s ease;
+}
+
+@keyframes bump {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.18); color: #ffe36b; text-shadow: 0 0 14px #ffd700, 0 0 28px #ffd700; }
+  100% { transform: scale(1); }
+}
+
+.jackpot-overlay .max-label {
+  margin-top: 8px;
+  font-size: 16px;
+  color: #fff;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.jackpot-overlay .input-pill {
+  width: 90%;
+  padding: 14px 12px;
+  border-radius: 12px;
+  background: rgba(0,0,0,1);
+  border: 1px solid rgba(255,215,0,0.4);
+  text-align: center;
+  color: #fff;
+  min-height: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin-bottom: 6px; 
+}
+
+.jackpot-overlay .input-label {
+  font-size: 16px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,1);
+}
+
+.jackpot-overlay .input-value {
+  font-family: 'Courier New', monospace;
+  font-size: 36px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 4px;
+  min-height: 32px;
+  text-shadow: 0 0 8px rgba(255,255,255,0.5);
+}
+
+.jackpot-overlay .input-value.empty {
+  color: rgba(255,255,255,1);
+}
+
+.jackpot-overlay .caret {
+  display: inline-block;
+  width: 2px;
+  height: 24px;
+  background: #ffd700;
+  margin-left: 2px;
+  vertical-align: middle;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+/* Flying number */
+.jackpot-overlay .fly {
+  position: fixed;
+  z-index: 200;
+  font-family: 'Courier New', monospace;
+  font-size: 64px;
+  font-weight: 900;
+  color: #ffd700;
+  text-shadow: 0 0 12px #ffd700, 0 0 24px #ff8f2e, 0 0 40px #ff3ea5, 0 2px 0 #000;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(0.4);
+  opacity: 0;
+  animation: fly 0.9s cubic-bezier(0.5, -0.3, 0.7, 1.2) forwards;
+}
+
+@keyframes fly {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.4) rotate(-15deg); }
+  15% { opacity: 1; transform: translate(-50%, -50%) scale(1.4) rotate(0deg); }
+  100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0.3) rotate(20deg); }
+}
+
+/* Coin particles */
+.jackpot-overlay .coin {
+  position: fixed;
+  z-index: 150;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff6a0, #ffcc00 45%, #a56b00 100%);
+  box-shadow: 0 0 10px #ffd700, 0 0 20px rgba(255,215,0,0.6);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  animation: coinFly 1s ease-out forwards;
+}
+
+@keyframes coinFly {
+  0% { opacity: 1; transform: translate(-50%, -50%) scale(0.6); }
+  100% { opacity: 0; transform: translate(var(--cx), var(--cy)) scale(0.2); }
+}
+
+/* Screen shake on hit */
+.jackpot-overlay .shake {
+  animation: shake 0.35s;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translate(0, 0); }
+  20% { transform: translate(-3px, 2px); }
+  40% { transform: translate(3px, -1px); }
+  60% { transform: translate(-2px, -2px); }
+  80% { transform: translate(2px, 1px); }
+}
+
+/* Max reached flash */
+.jackpot-overlay .max-flash {
+  animation: maxFlash 0.6s ease;
+}
+
+@keyframes maxFlash {
+  0%, 100% { color: #7cffb3; text-shadow: 0 0 8px #00ff88, 0 0 18px #00ff88; }
+  50% { color: #ff4d6d; text-shadow: 0 0 14px #ff0044, 0 0 28px #ff0044; }
+}
+
+/* Error shake on invalid entry */
+.jackpot-overlay .invalid {
+  animation: invalidShake 0.4s;
+}
+
+@keyframes invalidShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+
+/* Sparkles */
+.jackpot-overlay .spark {
+  position: fixed;
+  z-index: 120;
+  width: 6px;
+  height: 6px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #fff, 0 0 16px #ffd700;
+  pointer-events: none;
+  animation: sparkPop 0.7s ease-out forwards;
+}
+
+@keyframes sparkPop {
+  0% { opacity: 1; transform: translate(-50%, -50%) scale(0); }
+  50% { opacity: 1; transform: translate(calc(-50% + var(--sx)), calc(-50% + var(--sy))) scale(1.2); }
+  100% { opacity: 0; transform: translate(calc(-50% + var(--sx) * 1.4), calc(-50% + var(--sy) * 1.4)) scale(0); }
+}

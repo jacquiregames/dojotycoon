@@ -1,0 +1,445 @@
+/* --- New Style for Continue Prompt --- */
+.continue-prompt {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #94a3b8;
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  padding: 0.5rem 1rem; 
+  z-index: 100;
+  transition: all 0.2s ease-in-out;
+}
+
+.continue-prompt .key-highlight {
+  color: #e2e8f0;
+  font-weight: 500;
+  padding: 0.2rem 0.5rem;
+  border-radius: 0.25rem;
+  background-color: #334155;
+  border: 1px solid #475569;
+}
+
+/* --- Main Overlay --- */
+.card-randomizer-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  cursor: pointer;
+}
+
+.card-randomizer-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3rem;
+  padding: 2rem;
+  width: 100%;
+  max-width: 1920px;
+  min-height: 1200px;
+  background-color: rgba(20, 22, 30, 0); 
+  position: relative;
+  cursor: default;
+}
+
+.cards-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 250px;
+  position: relative;
+  perspective: 1200px;
+}
+
+/* --- Card Structure & Dimensions --- */
+.card-wrapper {
+  position: absolute;
+  width: 180px; /* Landscape width */
+  height: 120px; /* Landscape height */
+  transform-style: preserve-3d;
+}
+
+.card-randomizer-content.team-mode .card-wrapper {
+  width: 140px;
+  height: 140px;
+}
+
+/* Add this right below .vs-image-34: */
+.vs-image-2v1 {
+  left: 54%;
+  transform: translate(-50%, -50%);
+}
+
+.card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.card-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* --- Dynamic Deck Borders (While Shuffling) --- */
+
+.card-face.mode-prize-green {
+  border: 2px solid #0fff50;
+  box-shadow: inset 0 0 10px rgba(15, 255, 80, 0.2), 0 0 20px rgba(15, 255, 80, 0.6);
+}
+
+.card-face.mode-prize-red {
+  border: 2px solid #ff0000;
+  box-shadow: inset 0 0 10px rgba(255, 0, 0, 0.2), 0 0 20px rgba(255, 0, 0, 0.6);
+}
+
+/* "Duel" Mode (Player Draw) */
+.card-face.mode-player-draw {
+  border: 2px solid #0165FC;
+  box-shadow: inset 0 0 10px rgba(1, 101, 252, 0.2), 0 0 20px rgba(1, 101, 252, 0.6);
+}
+
+.card-face.mode-wager {
+  border: 2px solid #00a2ff;
+  box-shadow: inset 0 0 10px rgba(0, 162, 255, 0.2), 0 0 20px rgba(0, 162, 255, 0.6);
+}
+
+.card-face.mode-trials {
+  border: 2px solid #f97316; /* Vibrant Orange */
+  box-shadow: inset 0 0 10px rgba(249, 115, 22, 0.2), 0 0 20px rgba(249, 115, 22, 0.6);
+}
+
+.card-back {
+  background: #334155;
+  transform: rotateY(0deg); 
+  border: 1px solid #4a5d73;
+  padding: 0.5rem;
+}
+
+.card-front {
+  background: #111827;
+  border: 1px solid #4a5d73;
+  transform: rotateY(180deg);
+  color: white; 
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* --- Card Content & Images --- */ 
+.card-back img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Card flip animations */
+.card-wrapper.face-up .card-inner {
+  transform: rotateY(180deg);
+}
+.card-wrapper.face-down .card-inner {
+  transform: rotateY(0deg);
+}
+
+/* Base VS Image styles */
+.vs-image {
+  position: absolute;
+  top: 36%;
+  width: 80px;
+  height: 80px;
+  z-index: 100;
+  pointer-events: none;
+  filter: drop-shadow(0 0 10px rgba(0,0,0,0.7));
+}
+
+/* New position-specific classes for VS images */
+.vs-image-12 {
+  left: 40%;
+  transform: translate(-50%, -50%);
+}
+
+.vs-image-23 {
+  left: 48%;
+  transform: translate(-50%, -50%);
+}
+
+.vs-image-34 {
+  left: 56%;
+  transform: translate(-50%, -50%);
+}
+
+/* --- New Result Image Display --- */
+.result-image-container {
+  position: fixed;
+  inset: 0;
+  padding: 3rem;
+  z-index: 200; 
+  display: flex;
+  pointer-events: none; /* Prevents interference with overlay click */
+}
+
+.result-image-container.trials {
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.result-image-container.values {
+  align-items: center;
+  justify-content: center;
+}
+
+/* Targets the final zoomed-in winning card result */
+.result-image-values.result-mode-player-draw {
+  border: none;
+  box-shadow: none;
+}
+
+.result-image-trials {
+  margin-top: 30px;
+  object-fit: contain;
+  border-radius: 1rem;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8);
+  border: 4px solid white;
+  /* Hard caps to prevent overflow on unusual screen sizes */
+  max-width: 130vh;
+  max-height: 90vh;
+}
+@media (min-aspect-ratio: 1/1) {
+  .result-image-trials {
+    height: 90vh;
+    width: 120vh;
+  }
+}
+
+.result-image-values {
+  object-fit: contain;
+  border-radius: 1rem;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8);
+  border: 4px solid white; 
+  max-height: 68vh;
+  height: auto;
+  width: auto;
+}
+
+/* --- Mode-Specific Glow Borders --- */
+.result-image-values.result-mode-wager {
+  border-color: #00a2ff;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8), 0 0 30px #00a2ff;
+}
+
+.result-image-values.result-mode-prize-green {
+  border-color: #0fff50;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8), 0 0 30px #0fff50;
+}
+
+.result-image-values.result-mode-prize-red {
+  border-color: #ff0000;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8), 0 0 30px #ff0000;
+}
+/* --- Trial Bonus Sidebar --- */
+.trial-bonus-sidebar {
+  position: absolute;
+  right: 2rem;
+  top: 70%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  z-index: 150;
+  background: rgba(10, 10, 10, 1);
+  padding: 1.5rem;
+  border-radius: 1rem;
+  border: 4px solid rgba(255, 255, 255, 1); 
+  min-width: 28vw;
+}
+
+.bonus-dojo-name {
+  max-width: 29vw;
+  font-family: var(--font-display);
+  font-size: 3rem;
+  font-weight: normal; 
+  color: var(--dojo-color, #fff);
+  text-transform: uppercase;
+  text-shadow: 0 0 4px #000, 0 0 8px #000, 0 0 16px var(--dojo-color, #fff);
+  text-align: center;
+  margin-bottom: 0.5rem; 
+  border-bottom: 2px solid var(--dojo-color, #fff);
+  line-height: 1;
+}
+
+.bonus-player-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Creates exactly 2 equal-width columns */
+  gap: 1rem;
+}
+
+.bonus-player-list li {
+  font-family: var(--font-display);
+  font-size: 3.5rem;
+  font-weight: 500;
+  text-align: center;
+  text-shadow: 0 0 8px #000, 0 0 12px currentColor;
+}
+.bonus-player-list li:last-child:nth-child(odd) {
+  grid-column: span 2;
+}
+
+.bonus-empty-msg {
+  font-family: var(--font-sans);
+  font-size: 2.6rem;
+  color: orange;
+  text-align: center;  
+}
+
+/* --- Trial Dice Container --- */
+.trial-dice-container {
+  position: absolute;
+  bottom: 100%; /* Positions it directly above the top edge of the sidebar */
+  left: 0;
+  width: 100%;
+  max-width: 29vw;
+  height: 15vh; /* Exactly 10vh tall */
+  margin-bottom: 0.5rem; /* Space between the dice and the sidebar */
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  pointer-events: none; /* Prevents it from blocking clicks */
+  z-index: 160; 
+  background: rgba(10, 10, 10, 1);
+  border-radius: 1rem;
+  border: 4px solid rgba(255, 255, 255, 1); 
+
+}
+
+.trial-dice-image {
+  height: 100%;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 15px 20px rgba(0,0,0,0.7));
+  animation: pop-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+ 
+.trial-dice-image.d412,
+.trial-dice-image.d620, 
+.trial-dice-image.d820,
+.trial-dice-image.dall {
+  width: 100%;
+  object-fit: contain;
+}
+
+/* --- Trial Video Overlay --- */
+.trial-video-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  background-color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.trial-video-media {
+  width: 100vw;
+  height: 100vh;
+  object-fit: contain; /* This forces the letterbox/pillarbox behavior */
+  background-color: transparent;
+}
+
+/* --- Card Randomizer Background Video --- */
+.card-randomizer-bg-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill; /* Stretches to fill exactly like your other backgrounds */
+  z-index: -1;      /* Places it behind the cards and sidebar */
+  pointer-events: none;
+}
+
+.card-randomizer-rules-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* Keeps the rules image proportional so text isn't stretched/cut off */
+  z-index: 0;          /* Places it above the video (z-index: -1) but behind the UI cards */
+  pointer-events: none;
+}
+
+/* --- Override Alignment for Prize Modes --- */
+.result-image-container.mode-prize-green,
+.result-image-container.mode-prize-red {
+  justify-content: flex-start; /* Changes from center to left alignment */
+}
+
+/* --- Override Size for Prize Modes --- */
+.result-image-values.result-mode-prize-green,
+.result-image-values.result-mode-prize-red {
+  width: 60vw;
+  height: auto;
+  max-width: none; /* Ensures the default max-width doesn't conflict */
+}
+
+/* --- Prize Exit Video Overlay --- */
+.prize-exit-video-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  background-color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.prize-exit-video {
+  width: 100vw;
+  height: 100vh;
+  object-fit: fill; /* Stretches to fill exactly like your other backgrounds */
+  background-color: transparent;
+}
+
+.trial-example-image {
+  position: absolute;
+  top: 60px;
+  right: 0;
+  width: 100vw;
+  height: auto;
+  /* Hardcoded scale precisely mimicking TeamView's scale */
+  transform: scale(0.285);
+  transform-origin: top right;
+  border: 14px solid white;
+  border-radius: 4rem;
+  margin-top: 1rem;
+  margin-right: 1rem;
+  object-fit: cover;
+  background-color: #000;
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+  pointer-events: none;
+  z-index: 150; /* Places it safely above the cards but below trial/exit videos */
+}

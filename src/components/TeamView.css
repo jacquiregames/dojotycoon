@@ -1,0 +1,398 @@
+/* --- Overlay for Team View --- */
+.team-view-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  cursor: pointer;
+}
+
+.vs-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  cursor: default;
+  position: relative;
+}
+
+.team-view-bg-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill; 
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* --- Base Layout For 2v2 and 3v1 Container Halves --- */
+.team-display {
+  flex: 1;
+  height: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* ============================================================
+   DYNAMIC TEAM 2v2 POSITIONS 
+   ============================================================ */
+
+/* 2v2 & 3v1 Front Left (P1) */
+.team-p1-front {
+  position: absolute;
+  top: 60%;
+  left: 10%;
+  width: 45vw;
+  max-width: 600px;
+  z-index: 10;
+  transform: translate(-150%, -50%);
+  opacity: 0;
+}
+
+/* 2v2 & 3v1 Behind Left (P2) - offset to the right by 5vw */
+.team-p2-behind {
+  position: absolute;
+  top: 44%;
+  left: 44%;
+  width: 42vw;
+  max-width: 450px;
+  z-index: 5;
+  transform: translate(-150%, -50%);
+  opacity: 0;
+}
+
+/* 2v2 Behind Right (P3) - offset to the left by 5vw */
+.team-p3-behind {
+  position: absolute;
+  top: 44%;
+  right:44%;
+  width: 42vw;
+  max-width: 450px;
+  z-index: 5;
+  transform: translate(150%, -50%) scaleX(-1);
+  opacity: 0;
+}
+
+/* 2v2 Front Right (P4) */
+.team-p4-front {
+  position: absolute;
+  top: 60%;
+  right: 10%;
+  width: 45vw;
+  max-width: 600px;
+  z-index: 10;
+  transform: translate(150%, -50%) scaleX(-1);
+  opacity: 0;
+}
+
+/* ============================================================
+   DYNAMIC TEAM 3v1 POSITIONS 
+   ============================================================ */
+
+/* 3v1 Front Left (P1) */
+.team3v1-p1 {
+  position: absolute;
+  top: 70%;
+  left: 2%;
+  width: 32vw;
+  max-width: 540px;
+  z-index: 10;
+  transform: translate(-150%, -50%);
+  opacity: 0;
+}
+
+/* 3v1 Middle Left (P2) */
+.team3v1-p2 {
+  position: absolute;
+  top: 50%;
+  left: 30%;
+  width: 22vw;
+  max-width: 500px;
+  z-index: 7;
+  transform: translate(-150%, -50%);
+  opacity: 0;
+}
+
+/* 3v1 Back Left (P3) */
+.team3v1-p3 {
+  position: absolute;
+  top: 55%;
+  left: 45%;
+  width: 26vw;
+  max-width: 530px;
+  z-index: 4;
+  transform: translate(-150%, -50%);
+  opacity: 0;
+}
+
+/* 3v1 Right (P4) */
+.team3v1-p4 {
+  position: absolute;
+  top: 60%;
+  right: 2%;
+  width: 45vw;
+  max-width: 580px;
+  z-index: 10;
+  transform: translate(150%, -50%) scaleX(-1);
+  opacity: 0;
+}
+
+/* Base VS Image Configuration */
+.vs {
+  flex-shrink: 0;
+  z-index: 20;
+}
+
+.vs img {
+  width: 400px;
+  transform: translateY(180%);
+}
+
+.vs.vs-3v1 {
+  position: absolute;
+  left: 56%; /* Centered nicely between the staggered left and single right */
+  transform: translateX(-50%);
+  z-index: 10;
+}
+
+.vs.vs-2v1 {
+  position: absolute;
+  left: 58%; /* Balances the 2-player left team (which reaches to ~44%) against the lone right player at ~90% */
+  transform: translateX(-50%);
+  z-index: 10;
+}
+
+
+/* --- TOURNEY MODE SPECIFIC STYLES --- */
+.vs-container.mode-tourny {
+  display: block;
+}
+
+.vs-container.mode-tourny .team-display,
+.vs-container.mode-tourny .vs {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.vs-container.mode-tourny .vs {
+  z-index: 5; 
+}
+
+.tourny-p1 {
+  position: absolute;
+  top: 50%;
+  left: 2%; 
+  width: 415px;
+  max-width: 22vw; 
+  transform: translate(0, -50%) scaleX(1);
+  opacity: 0;
+}
+
+.tourny-p2 {
+  position: absolute;
+  top: 49%;
+  left: 38%; 
+  width: 440px;
+  max-width: 25vw;
+  transform: translate(-50%, -50%) scaleX(-1);
+  opacity: 0;
+}
+
+.tourny-p3 {
+  position: absolute;
+  top: 49%;
+  left: 62%; 
+  width: 430px;
+  max-width: 23vw;
+  transform: translate(-50%, -50%) scaleX(1);
+  opacity: 0;
+}
+
+.tourny-p4 {
+  position: absolute;
+  top: 50%;
+  right: 2%; 
+  width: 415px;
+  max-width: 22vw;
+  transform: translate(0, -50%) scaleX(-1);
+  opacity: 0;
+}
+
+img.tourny-vs1 {
+  position: absolute;
+  top: 50%;
+  left: 25%; 
+  width: 300px;
+  max-width: 12vw;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+}
+
+img.tourny-vs2 {
+  position: absolute;
+  top: 50%;
+  left: 75%; 
+  width: 300px;
+  max-width: 12vw;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+}
+
+
+/* ============================================================
+   ANIMATION TRIGGERS 
+   ============================================================ */
+
+/* 2v2 Standard Animations */
+.vs-container.show .team-p1-front {
+  animation: anim-p1-front 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.vs-container.show .team-p2-behind {
+  animation: anim-p2-behind 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards 0.1s;
+}
+.vs-container.show .team-p3-behind {
+  animation: anim-p3-behind 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards 0.1s;
+}
+.vs-container.show .team-p4-front {
+  animation: anim-p4-front 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* 3v1 Standard Animations (Reusing the directional keyframes) */
+.vs-container.show .team3v1-p1 {
+  animation: anim-p1-front 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.vs-container.show .team3v1-p2 {
+  animation: anim-p1-front 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards 0.1s;
+}
+.vs-container.show .team3v1-p3 {
+  animation: anim-p1-front 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards 0.2s;
+}
+.vs-container.show .team3v1-p4 {
+  animation: anim-p4-front 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards 0.1s;
+}
+
+/* VS Image Drop In */
+.vs-container.show .vs img {
+  animation: slideInUp 0.6s ease-out forwards;
+}
+
+/* Tourny Mode Animations */
+.vs-container.show.mode-tourny .tourny-p1 {
+  animation: anim-tourny-p1 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.vs-container.show.mode-tourny .tourny-p2 {
+  animation: anim-tourny-p2 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards 0.1s;
+}
+.vs-container.show.mode-tourny .tourny-p3 {
+  animation: anim-tourny-p3 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards 0.2s;
+}
+.vs-container.show.mode-tourny .tourny-p4 {
+  animation: anim-tourny-p4 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards 0.3s;
+}
+.vs-container.show.mode-tourny .tourny-vs1 {
+  animation: anim-tourny-vs 0.5s ease-out forwards 0.4s;
+}
+.vs-container.show.mode-tourny .tourny-vs2 {
+  animation: anim-tourny-vs 0.5s ease-out forwards 0.5s;
+}
+
+
+/* ============================================================
+   KEYFRAMES 
+   ============================================================ */
+
+/* New 2v2 / 3v1 Keyframes */
+@keyframes anim-p1-front {
+  0% { transform: translate(-100%, -50%); opacity: 0; }
+  80% { transform: translate(2%, -50%); opacity: 1; }
+  100% { transform: translate(0, -50%); opacity: 1; }
+}
+
+@keyframes anim-p2-behind {
+  0% { transform: translate(-100%, -50%); opacity: 0; }
+  80% { transform: translate(2%, -50%); opacity: 1; }
+  100% { transform: translate(-8%, -50%); opacity: 1; }
+}
+
+@keyframes anim-p3-behind {
+  0% { transform: translate(100%, -50%) scaleX(-1); opacity: 0; }
+  80% { transform: translate(-2%, -50%) scaleX(-1); opacity: 1; }
+  100% { transform: translate(0, -50%) scaleX(-1); opacity: 1; }
+}
+
+@keyframes anim-p4-front {
+  0% { transform: translate(100%, -50%) scaleX(-1); opacity: 0; }
+  80% { transform: translate(-2%, -50%) scaleX(-1); opacity: 1; }
+  100% { transform: translate(0, -50%) scaleX(-1); opacity: 1; }
+}
+
+/* VS and Tourny Keyframes */
+@keyframes slideInUp {
+  to { transform: translateY(0); }
+}
+
+@keyframes anim-tourny-p1 {
+  0% { transform: translate(-100%, -50%) scaleX(1); opacity: 0; }
+  80% { transform: translate(10px, -50%) scaleX(1); opacity: 1; }
+  100% { transform: translate(0, -50%) scaleX(1); opacity: 1; }
+}
+
+@keyframes anim-tourny-p2 {
+  0% { transform: translate(-100%, -50%) scaleX(-1); opacity: 0; }
+  80% { transform: translate(-45%, -50%) scaleX(-1); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scaleX(-1); opacity: 1; }
+}
+
+@keyframes anim-tourny-p3 {
+  0% { transform: translate(50%, -50%) scaleX(1); opacity: 0; }
+  80% { transform: translate(-55%, -50%) scaleX(1); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scaleX(1); opacity: 1; }
+}
+
+@keyframes anim-tourny-p4 {
+  0% { transform: translate(100%, -50%) scaleX(-1); opacity: 0; }
+  80% { transform: translate(-10px, -50%) scaleX(-1); opacity: 1; }
+  100% { transform: translate(0, -50%) scaleX(-1); opacity: 1; }
+}
+
+@keyframes anim-tourny-vs {
+  0% { transform: translate(-50%, 50px) scale(0.5); opacity: 0; }
+  80% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+
+/* ============================================================
+   MINIMIZED STATE
+   ============================================================ */
+
+.team-view-overlay.minimized {
+  background: transparent !important;
+  pointer-events: none !important; 
+}
+
+.team-view-overlay.minimized .vs-container {
+  position: absolute;
+  top: 60px;
+  right: 0;
+  width: 100vw;
+  height: 100vh;
+  transform: scale(0.285);
+  transform-origin: top right;
+  border: 14px solid white;
+  border-radius: 4rem;
+  margin-top: 1rem;
+  margin-right: 1rem;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1); 
+}
+

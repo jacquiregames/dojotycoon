@@ -1,0 +1,446 @@
+/* ============================================
+   OVERLAY & CONTAINER LAYOUT
+   ============================================ */
+.round-change-overlay {
+position: fixed;
+inset: 0;
+display: flex;
+align-items: center;
+justify-content: center;
+background: rgba(0, 0, 0, 0.7);
+backdrop-filter: blur(12px);
+z-index: 300; /* Ensures it sits above TeamView and GameTracker */
+}
+
+.coins-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  z-index: 3000;
+  pointer-events: none; /* Prevents it from blocking clicks */
+}
+
+/* Finale Video 15 -> Game Over */
+.finale-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: contain;
+  background-color: #000;
+  z-index: 10;
+}
+
+.round-change-container {
+  width: 100vw;
+  height: 100vh;
+  max-width: 1920px;
+  max-height: 1280px; 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #000000;
+  position: relative;
+  user-select: none;
+  -webkit-user-select: none;
+  overflow: hidden;
+}
+
+/* Subtle grid overlay */
+.round-change-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+}
+
+/* ============================================
+   ANIMATED BACKGROUND PARTICLES
+   ============================================ */
+.bg-particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  animation: floatUp linear infinite;
+  opacity: 0;
+}
+
+@keyframes floatUp {
+  0% { transform: translateY(80vh) scale(0); opacity: 0; }
+  10% { opacity: 0.6; }
+  90% { opacity: 0.2; }
+  100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+}
+
+/* ============================================
+   MAIN DISPLAY AREA
+   ============================================ */
+.display-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 1;
+  width: 100%;
+}
+
+.glow-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%);
+  pointer-events: none;
+  transition: all 0.6s ease;
+}
+
+.glow-ring.burst {
+  animation: ringBurst 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes ringBurst {
+  0% {
+    width: 320px;
+    height: 320px;
+    opacity: 1;
+    background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%);
+  }
+  40% {
+    width: 600px;
+    height: 600px;
+    opacity: 0.8;
+    background: radial-gradient(circle, rgba(236,72,153,0.3) 0%, rgba(99,102,241,0.15) 40%, transparent 60%);
+  }
+  100% {
+    width: 900px;
+    height: 900px;
+    opacity: 0;
+    background: radial-gradient(circle, rgba(236,72,153,0) 0%, transparent 70%);
+  }
+}
+
+/* ============================================
+   ROUND TEXT
+   ============================================ */
+.round-number {
+  font-family: var(--font-julee, sans-serif);
+  font-size: 10rem;
+  font-weight: 900;
+  line-height: 1;
+  background: linear-gradient(135deg, #fff 0%, #a5b4fc 40%, #6366f1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 40px rgba(99, 102, 241, 0.5));
+  transition: all 0.15s ease;
+  text-align: center;
+}
+
+.round-number.game-over {
+  font-size: 8rem;
+  background: linear-gradient(135deg, #fca5a5 0%, #ef4444 40%, #dc2626 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 50px rgba(239, 68, 68, 0.7));
+}
+
+/* ============================================
+   VIDEO CONTAINER
+   ============================================ */
+.video-container {
+  margin-top: 1.5rem;
+  height: 80vh;
+  width: 100%;
+  max-width: 1800px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden; 
+  background: rgba(0, 0, 0, 0.6);
+  position: relative;
+  z-index: 2;
+}
+
+.round-video {
+  height: 100%;
+  width: 100%;
+  object-fit: contain;
+  background-color: transparent;
+}
+
+/* ============================================
+   15 UNIQUE ROUND TRANSITIONS
+   ============================================ */
+.round-out-1 { animation: outFlip1 0.4s cubic-bezier(0.6, 0, 1, 0.3) forwards; }
+.round-in-1  { animation: inFlip1 0.5s cubic-bezier(0.2, 1, 0.2, 1) forwards; }
+@keyframes outFlip1 {
+  0%   { transform: scale(1) rotateY(0deg); opacity: 1; filter: drop-shadow(0 0 40px rgba(99, 102, 241, 0.5)); }
+  100% { transform: scale(0.3) rotateY(180deg); opacity: 0; filter: drop-shadow(0 0 100px rgba(99, 102, 241, 1)) blur(10px); }
+}
+@keyframes inFlip1 {
+  0%   { transform: scale(0.3) rotateY(-180deg); opacity: 0; filter: drop-shadow(0 0 100px rgba(99, 102, 241, 1)) blur(10px); }
+  100% { transform: scale(1) rotateY(0deg); opacity: 1; filter: drop-shadow(0 0 40px rgba(99, 102, 241, 0.5)); }
+}
+
+.round-out-2 { animation: outSpin2 0.45s cubic-bezier(0.5, 0, 1, 0.4) forwards; }
+.round-in-2  { animation: inSpin2 0.5s cubic-bezier(0.15, 1, 0.25, 1) forwards; }
+@keyframes outSpin2 {
+  0%   { transform: scale(1) rotate(0deg); opacity: 1; }
+  100% { transform: scale(0) rotate(360deg); opacity: 0; filter: blur(15px); }
+}
+@keyframes inSpin2 {
+  0%   { transform: scale(0) rotate(-360deg); opacity: 0; filter: blur(15px); }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+.round-out-3 { animation: outSlide3 0.35s cubic-bezier(0.7, 0, 1, 0.2) forwards; }
+.round-in-3  { animation: inSlide3 0.45s cubic-bezier(0.25, 1, 0.3, 1) forwards; }
+@keyframes outSlide3 {
+  0%   { transform: translateX(0); opacity: 1; }
+  100% { transform: translateX(-100vw); opacity: 0; filter: blur(20px); }
+}
+@keyframes inSlide3 {
+  0%   { transform: translateX(100vw); opacity: 0; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+
+.round-out-4 { animation: outShrink4 0.4s cubic-bezier(0.8, 0, 1, 0.2) forwards; }
+.round-in-4  { animation: inShrink4 0.45s cubic-bezier(0.1, 1, 0.2, 1) forwards; }
+@keyframes outShrink4 {
+  0%   { transform: scale(1); opacity: 1; filter: drop-shadow(0 0 40px rgba(99, 102, 241, 0.5)); }
+  100% { transform: scale(0.01); opacity: 0; filter: drop-shadow(0 0 200px rgba(99, 102, 241, 1)); }
+}
+@keyframes inShrink4 {
+  0%   { transform: scale(20); opacity: 0; filter: drop-shadow(0 0 200px rgba(99, 102, 241, 1)); }
+  100% { transform: scale(1); opacity: 1; filter: drop-shadow(0 0 40px rgba(99, 102, 241, 0.5)); }
+}
+
+.round-out-5 { animation: outFade5 0.3s ease-out forwards; }
+.round-in-5  { animation: inFade5 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+@keyframes outFade5 {
+  0%   { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.5); filter: blur(8px); }
+}
+@keyframes inFade5 {
+  0%   { opacity: 0; transform: scale(0.5) translateY(20px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.round-out-6 { animation: outCrush6 0.4s cubic-bezier(0.8, 0, 1, 0.2) forwards; }
+.round-in-6  { animation: inCrush6 0.5s cubic-bezier(0.1, 1, 0.25, 1) forwards; }
+@keyframes outCrush6 {
+  0%   { transform: scaleX(1) scaleY(1); opacity: 1; }
+  100% { transform: scaleX(0.1) scaleY(0); opacity: 0; filter: blur(12px); }
+}
+@keyframes inCrush6 {
+  0%   { transform: scaleX(0.1) scaleY(0); opacity: 0; }
+  100% { transform: scaleX(1) scaleY(1); opacity: 1; }
+}
+
+.round-out-7 { animation: outTumble7 0.5s cubic-bezier(0.6, 0, 1, 0.3) forwards; }
+.round-in-7  { animation: inTumble7 0.5s cubic-bezier(0.1, 1, 0.2, 1) forwards; }
+@keyframes outTumble7 {
+  0%   { transform: scale(1) rotate(0deg); opacity: 1; }
+  33%  { transform: scale(1.2) rotate(120deg); opacity: 0.7; }
+  66%  { transform: scale(0.8) rotate(240deg); opacity: 0.4; }
+  100% { transform: scale(0) rotate(360deg); opacity: 0; filter: blur(15px); }
+}
+@keyframes inTumble7 {
+  0%   { transform: scale(0) rotate(-360deg); opacity: 0; }
+  33%  { transform: scale(0.8) rotate(-240deg); opacity: 0.4; }
+  66%  { transform: scale(1.2) rotate(-120deg); opacity: 0.8; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+.round-out-8 { animation: outBlast8 0.35s cubic-bezier(0.7, 0, 1, 0.2) forwards; }
+.round-in-8  { animation: inBlast8 0.45s cubic-bezier(0.2, 1, 0.25, 1) forwards; }
+@keyframes outBlast8 {
+  0%   { transform: scale(1); opacity: 1; filter: drop-shadow(0 0 40px rgba(99, 102, 241, 0.5)); }
+  50%  { transform: scale(1.3); opacity: 0.8; filter: drop-shadow(0 0 100px rgba(99, 102, 241, 0.9)); }
+  100% { transform: scale(0) translateX(50px); opacity: 0; }
+}
+@keyframes inBlast8 {
+  0%   { transform: scale(0) translateX(-50px); opacity: 0; filter: drop-shadow(0 0 100px rgba(99, 102, 241, 0.9)); }
+  50%  { transform: scale(1.3); opacity: 0.8; filter: drop-shadow(0 0 100px rgba(99, 102, 241, 0.9)); }
+  100% { transform: scale(1); opacity: 1; filter: drop-shadow(0 0 40px rgba(99, 102, 241, 0.5)); }
+}
+
+.round-out-9 { animation: outRise9 0.4s cubic-bezier(0.5, 0, 1, 0.3) forwards; }
+.round-in-9  { animation: inRise9 0.5s cubic-bezier(0.2, 1, 0.25, 1) forwards; }
+@keyframes outRise9 {
+  0%   { transform: translateY(0) scale(1); opacity: 1; }
+  100% { transform: translateY(-150px) scale(0); opacity: 0; filter: blur(15px); }
+}
+@keyframes inRise9 {
+  0%   { transform: translateY(150px) scale(0); opacity: 0; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.round-out-10 { animation: outFlipX10 0.35s cubic-bezier(0.6, 0, 1, 0.3) forwards; }
+.round-in-10  { animation: inFlipX10 0.45s cubic-bezier(0.2, 1, 0.2, 1) forwards; }
+@keyframes outFlipX10 {
+  0%   { transform: scale(1); opacity: 1; }
+  100% { transform: scaleX(0) scaleY(1); opacity: 0; filter: blur(10px); }
+}
+@keyframes inFlipX10 {
+  0%   { transform: scaleX(0) scaleY(1); opacity: 0; }
+  100% { transform: scaleX(1) scaleY(1); opacity: 1; }
+}
+
+.round-out-11 { animation: outPop11 0.4s cubic-bezier(0.7, 0, 1, 0.25) forwards; }
+.round-in-11  { animation: inPop11 0.5s cubic-bezier(0.15, 1, 0.3, 1) forwards; }
+@keyframes outPop11 {
+  0%   { transform: scale(1); opacity: 1; }
+  30%  { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(0); opacity: 0; filter: blur(12px); }
+}
+@keyframes inPop11 {
+  0%   { transform: scale(0); opacity: 0; }
+  60%  { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.round-out-12 { animation: outFold12 0.45s cubic-bezier(0.6, 0, 1, 0.3) forwards; }
+.round-in-12  { animation: inFold12 0.5s cubic-bezier(0.2, 1, 0.25, 1) forwards; }
+@keyframes outFold12 {
+  0%   { transform: scale(1); opacity: 1; }
+  100% { transform: scale(0.1) perspective(800px) rotateX(90deg); opacity: 0; filter: blur(15px); }
+}
+@keyframes inFold12 {
+  0%   { transform: scale(0.1) perspective(800px) rotateX(-90deg); opacity: 0; filter: blur(15px); }
+  100% { transform: scale(1) rotateX(0); opacity: 1; }
+}
+
+.round-out-13 { animation: outVanish13 0.3s cubic-bezier(0.8, 0, 1, 0.2) forwards; }
+.round-in-13  { animation: inVanish13 0.4s cubic-bezier(0.1, 1, 0.3, 1) forwards; }
+@keyframes outVanish13 {
+  0%   { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0) rotate(180deg); filter: blur(20px); }
+}
+@keyframes inVanish13 {
+  0%   { opacity: 0; transform: scale(0.01); letter-spacing: 1em; }
+  100% { opacity: 1; transform: scale(1); letter-spacing: normal; }
+}
+
+.round-out-14 { animation: outZoom14 0.4s cubic-bezier(0.7, 0, 1, 0.25) forwards; }
+.round-in-14  { animation: inZoom14 0.5s cubic-bezier(0.2, 1, 0.25, 1) forwards; }
+@keyframes outZoom14 {
+  0%   { transform: scale(1); opacity: 1; }
+  100% { transform: scale(0); opacity: 0; filter: blur(15px); }
+}
+@keyframes inZoom14 {
+  0%   { transform: scale(0); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.round-out-15 { animation: outFinal15 0.5s cubic-bezier(0.6, 0, 1, 0.3) forwards; }
+.round-in-15  { animation: inFinal15 0.6s cubic-bezier(0.1, 1, 0.2, 1) forwards; }
+@keyframes outFinal15 {
+  0%   { transform: scale(1) rotate(0deg); opacity: 1; }
+  30%  { transform: scale(1.2) rotate(10deg); opacity: 0.8; filter: drop-shadow(0 0 80px rgba(99, 102, 241, 0.9)); }
+  100% { transform: scale(0) rotate(-20deg); opacity: 0; filter: drop-shadow(0 0 0px transparent) blur(20px); }
+}
+@keyframes inFinal15 {
+  0%   { transform: scale(0.4) rotate(5deg); opacity: 0; filter: drop-shadow(0 0 200px rgba(239, 68, 68, 0.8)); }
+  50%  { transform: scale(1.1) rotate(-2deg); opacity: 1; filter: drop-shadow(0 0 100px rgba(239, 68, 68, 0.9)); }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; filter: drop-shadow(0 0 50px rgba(239, 68, 68, 0.7)); }
+}
+
+/* ============================================
+   GAME OVER TRANSITION
+   ============================================ */
+.animating-out.game-over-out .round-number {
+  animation: gameOverOutWarp 0.6s cubic-bezier(0.8, 0, 1, 0.3) forwards;
+}
+
+.animating-in.game-over-in .round-number {
+  animation: gameOverInNova 0.8s cubic-bezier(0.05, 0.7, 0.1, 1) forwards;
+}
+
+@keyframes gameOverOutWarp {
+  0%   { transform: scale(1) rotate(0deg); opacity: 1; filter: drop-shadow(0 0 40px rgba(99, 102, 241, 0.5)); }
+  30%  { transform: scale(1.2) rotate(-15deg); filter: drop-shadow(0 0 100px rgba(236, 72, 153, 0.8)); }
+  100% { transform: scale(0) rotate(720deg); opacity: 0; filter: drop-shadow(0 0 0px transparent) blur(15px); }
+}
+
+@keyframes gameOverInNova {
+  0%   { transform: scale(0) rotate(-180deg); opacity: 0; filter: drop-shadow(0 0 200px rgba(239, 68, 68, 1)); }
+  60%  { transform: scale(1.1) rotate(10deg); opacity: 1; filter: drop-shadow(0 0 150px rgba(239, 68, 68, 0.8)); }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; filter: drop-shadow(0 0 50px rgba(239, 68, 68, 0.7)); }
+}
+
+/* ============================================
+   WARP SPEED CAMERA SHAKE
+   ============================================ */
+.warp-shake {
+  animation: warpShakeAnim 0.4s cubic-bezier(0.1, 1, 0.1, 1) both;
+}
+
+@keyframes warpShakeAnim {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  15% { transform: translate(-6px, 0) scale(1.02); }
+  30% { transform: translate(6px, -3px) scale(0.98); }
+  45% { transform: translate(-4px, 4px) scale(1.03); }
+  60% { transform: translate(4px, -2px) scale(0.99); }
+  75% { transform: translate(-2px, 2px) scale(1.01); }
+}
+
+/* ============================================
+   HYPERDRIVE LIGHT STREAKS
+   ============================================ */
+.streaks-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.light-streak {
+  position: absolute;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--streak-color), transparent);
+  animation: streakShoot 0.4s linear forwards;
+  opacity: 0;
+}
+
+@keyframes streakShoot {
+  0% { transform: translateX(-100vw) scaleX(1); opacity: 1; }
+  50% { transform: translateX(0) scaleX(3); opacity: 1; }
+  100% { transform: translateX(100vw) scaleX(1); opacity: 0; }
+}
+
+/* ============================================
+   HINT TEXT
+   ============================================ */
+.hint-text {
+  margin-top: 64px;
+  font-size: 1.5rem;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  font-family: var(--font-julee, sans-serif);
+  gap: 10px;
+}
+
