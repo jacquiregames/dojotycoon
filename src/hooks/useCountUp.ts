@@ -43,3 +43,4 @@ export function useCountUp(endValue: number, duration: number = 500) {
   return count;
 }
 
+

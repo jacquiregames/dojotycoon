@@ -311,6 +311,29 @@
   font-size: 2.6rem;
   color: orange;
   text-align: center;  
+} 
+
+.trial-bonus-sidebar.has-bonus-players {
+  animation: bonus-border-pulse 1s ease-in-out infinite;
+}
+
+@keyframes bonus-border-pulse {
+  0%, 100% {
+    border-color: rgba(255, 255, 255, 1);
+    background-color: rgba(10, 10, 10, 1);
+    box-shadow: 
+      0 0 0 rgba(255, 215, 0, 0),
+      0 0 0 rgba(255, 140, 0, 0),
+      inset 0 0 0 rgba(255, 215, 0, 0);
+  }
+  50% {
+    border-color: rgba(255, 223, 0, 1); /* Brighter gold border */
+    background-color: rgba(35, 28, 0, 1); /* Illuminated golden background */
+    box-shadow: 
+      0 0 30px 8px rgba(255, 215, 0, 0.9),       /* Intense inner gold aura */
+      0 0 60px 18px rgba(255, 140, 0, 0.6),      /* Wider orange-gold outer halo */
+      inset 0 0 25px 5px rgba(255, 215, 0, 0.4); /* Inner glow bleeding into the box */
+  }
 }
 
 /* --- Trial Dice Container --- */
@@ -355,7 +378,7 @@
 .trial-video-overlay {
   position: fixed;
   inset: 0;
-  z-index: 3000;
+  z-index: var(--z-cinematic);
   background-color: #000;
   display: flex;
   align-items: center;
@@ -410,7 +433,7 @@
 .prize-exit-video-overlay {
   position: fixed;
   inset: 0;
-  z-index: 3000;
+  z-index: var(--z-cinematic);
   background-color: #000;
   display: flex;
   align-items: center;
@@ -443,3 +466,4 @@
   pointer-events: none;
   z-index: 150; /* Places it safely above the cards but below trial/exit videos */
 }
+

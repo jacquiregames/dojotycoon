@@ -18,7 +18,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
-  z-index: 50; /* Below the modal, but above other content */
+  z-index: var(--z-ui-controls);
 }
 
 .global-control-button {
@@ -382,7 +382,7 @@ tr:last-child .data-cell {
 .vamp-overlay {
   position: fixed;
   inset: 0;
-  z-index: 3000; /* Sits above everything else */
+  z-index: var(--z-cinematic);
   background-color: rgba(0, 0, 0, 0.85); /* Darkens the background */
   backdrop-filter: blur(8px);
   display: flex;
@@ -410,7 +410,7 @@ tr:last-child .data-cell {
 .outtakes-video-overlay {
   position: fixed;
   inset: 0;
-  z-index: 2000;
+  z-index: var(--z-cinematic);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -424,4 +424,5 @@ tr:last-child .data-cell {
   object-fit: contain;
   background-color: transparent;
 }
+
 

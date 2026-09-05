@@ -197,3 +197,4 @@ export default function TeamView({ selected, mode, onClose, autoMinimize, onMini
   );
 }
 
+

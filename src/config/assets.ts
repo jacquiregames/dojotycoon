@@ -36,3 +36,4 @@ export const ASSETS = {
   getBossVideo: (id: number) => `/bosses/${id}.mp4`,
   getTrialVideo: (id: string | number) => `/trialvideos/${id}.mp4`,
 };
+

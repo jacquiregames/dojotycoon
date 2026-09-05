@@ -26,13 +26,52 @@ interface LandingPageProps {
 export default function LandingPage({ onStart }: LandingPageProps) {
   const [players, setPlayers] = useState<Player[]>(initialPlayers);
   const [totalRounds, setTotalRounds] = useState<number>(15);
-  const [playerCount, setPlayerCount] = useState<number>(4); // NEW
+  const [playerCount, setPlayerCount] = useState<number>(4);
   const [showStartVideo, setShowStartVideo] = useState(false);
   const [showHowToPlayVideo, setShowHowToPlayVideo] = useState(false);
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const howToPlayVideoRef = useRef<HTMLVideoElement | null>(null);
+  const loopVideoRef = useRef<HTMLVideoElement | null>(null); // NEW: Ref for the looping background video
+
+  // Release the loop video's buffer whenever it actually unmounts - it's
+  // the only one of the three that's conditionally rendered (see the JSX
+  // below); showStartVideo/showHowToPlayVideo becoming true is exactly
+  // when it disappears.
+  useEffect(() => {
+    const loopVideo = loopVideoRef.current;
+    return () => {
+      if (loopVideo) {
+        loopVideo.pause();
+        loopVideo.removeAttribute('src');
+        loopVideo.load();
+      }
+    };
+  }, [showStartVideo, showHowToPlayVideo]);
+
+  // The start/how-to-play <video> elements are NEVER conditionally
+  // unmounted - they're always present in the DOM and only toggled via a
+  // CSS class (see the "active" class below). Releasing their buffers on
+  // every flag change (rather than only on final unmount) would pause and
+  // strip the src of whichever one just started playing - e.g. clicking
+  // "Start Game" would immediately kill the start video before it could
+  // ever fire onEnded, softlocking the landing page. So these are only
+  // released once, when LandingPage itself unmounts (i.e. the game has
+  // actually started and this component is being swapped out).
+  useEffect(() => {
+    const startVideo = videoRef.current;
+    const howToPlayVideo = howToPlayVideoRef.current;
+    return () => {
+      [startVideo, howToPlayVideo].forEach(el => {
+        if (el) {
+          el.pause();
+          el.removeAttribute('src');
+          el.load();
+        }
+      });
+    };
+  }, []);
 
   useEffect(() => {
     const audio = new Audio(ASSETS.MUSIC.INTRO);
@@ -107,10 +146,7 @@ export default function LandingPage({ onStart }: LandingPageProps) {
     }
 
   }, [showStartVideo, showHowToPlayVideo]);
-
-  // Routed through the same central key router every other overlay in the
-  // app uses, so a future overlay layered on top of the landing screen
-  // can't silently collide with this handler (see useKeyRouter.tsx).
+ 
   const handleKeyDown = useCallback((e: KeyboardEvent): boolean => {
     if (e.key !== 'Enter' && e.code !== 'NumpadEnter') return false;
 
@@ -157,6 +193,7 @@ export default function LandingPage({ onStart }: LandingPageProps) {
       {!showStartVideo && !showHowToPlayVideo && (
         <div className="landing-loop-video-container">
           <video 
+            ref={loopVideoRef} // NEW: Attach ref to loop video
             src="/backgrounds/landing.mp4" 
             autoPlay 
             loop 
@@ -167,6 +204,7 @@ export default function LandingPage({ onStart }: LandingPageProps) {
         </div>
       )}
 
+      {/* (Rest of the JSX remains exactly the same, as the other refs are already attached) */}
       <div className={`landing-video-overlay ${showStartVideo ? 'active' : ''}`}>
         <video 
           ref={videoRef} 
@@ -175,7 +213,6 @@ export default function LandingPage({ onStart }: LandingPageProps) {
           preload="auto" 
           className="landing-video" 
           onEnded={() => {
-            // Slice the players array so the rest of the app only sees 3 players!
             onStart(players.slice(0, playerCount).map((p, i) => ({ ...p, name: p.name.trim() || `NINJA${i + 1}` })), totalRounds);
           }}
         />
@@ -292,4 +329,5 @@ export default function LandingPage({ onStart }: LandingPageProps) {
     </main>
   );
 }
+
 

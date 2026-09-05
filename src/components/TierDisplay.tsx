@@ -30,3 +30,4 @@ export default function TierDisplay({ tier }: TierDisplayProps) {
     </div>
   );
 }
+

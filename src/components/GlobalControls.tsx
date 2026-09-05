@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import type { Player, RandomizerMode, RandomizerExtraProps } from '../types';
 
 interface GlobalControlsProps { 
@@ -11,12 +12,12 @@ interface GlobalControlsProps {
   openArguePopup: () => void; 
   setShowOuttakes: (show: boolean) => void;
 }
-
+ 
 export default function GlobalControls({
   roundNumber, totalRounds, playerCount, isChangingRound, openRandomizer,
   openVampPopup, openBoardNinjaPopup, openArguePopup, setShowOuttakes,
 }: GlobalControlsProps) {
-  
+
   const isDisabled = roundNumber > totalRounds || isChangingRound;
 
   let tierImageSrc = '';
@@ -24,11 +25,36 @@ export default function GlobalControls({
   else if (playerCount === 3 && totalRounds === 15) tierImageSrc = '/tier/300800.png';
   else if (playerCount === 4 && totalRounds === 10) tierImageSrc = '/tier/400800.png';
   else if (playerCount === 4 && totalRounds === 15) tierImageSrc = '/tier/400990.png';
+ 
+  const handleTrialsClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    e.currentTarget.blur();
+    openRandomizer('trials', undefined, undefined, { roundNumber });
+  }, [openRandomizer, roundNumber]);
+
+  const handleGreenClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    e.currentTarget.blur();
+    openRandomizer('prize-green');
+  }, [openRandomizer]);
+
+  const handleRedClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    e.currentTarget.blur();
+    openRandomizer('prize-red');
+  }, [openRandomizer]);
+
+  const handleWagerClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    e.currentTarget.blur();
+    openRandomizer('wager');
+  }, [openRandomizer]);
+
+  const handleOuttakesClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    e.currentTarget.blur();
+    setShowOuttakes(true);
+  }, [setShowOuttakes]);
 
   return (
     <div className="global-controls-container">
       <div className="trials-container">
-        <button className="global-control-button" disabled={isDisabled} onClick={(e) => { e.currentTarget.blur(); openRandomizer('trials', undefined, undefined, { roundNumber }); }}>
+        <button className="global-control-button" disabled={isDisabled} onClick={handleTrialsClick}>
           <img src="/buttons/trials.png" alt="Shuffle Trials" className="main-btn-img" />
           <img src="/banners/plus.png" alt="Shortcut Plus" className="shortcut-badge" />
         </button>
@@ -36,17 +62,17 @@ export default function GlobalControls({
         <span className="round-text">{roundNumber > totalRounds ? 'GAME OVER' : `Round ${roundNumber}`}</span>
       </div>
       
-      <button className="global-control-button" disabled={isDisabled} onClick={(e) => { e.currentTarget.blur(); openRandomizer('prize-green'); }}>
+      <button className="global-control-button" disabled={isDisabled} onClick={handleGreenClick}>
         <img src="/buttons/green.png" alt="Shuffle Green Prize" className="main-btn-img" />
         <img src="/banners/divide.png" alt="Shortcut Divide" className="shortcut-badge" />
       </button>
 
-      <button className="global-control-button" disabled={isDisabled} onClick={(e) => { e.currentTarget.blur(); openRandomizer('prize-red'); }}>
+      <button className="global-control-button" disabled={isDisabled} onClick={handleRedClick}>
         <img src="/buttons/red.png" alt="Shuffle Red Prize" className="main-btn-img" />
         <img src="/banners/mult.png" alt="Shortcut Multiply" className="shortcut-badge" />
       </button>
 
-      <button className="global-control-button" disabled={isDisabled} onClick={(e) => { e.currentTarget.blur(); openRandomizer('wager'); }}>
+      <button className="global-control-button" disabled={isDisabled} onClick={handleWagerClick}>
         <img src="/buttons/wager.png" alt="Shuffle Wager" className="main-btn-img" />
         <img src="/banners/minus.png" alt="Shortcut Minus" className="shortcut-badge" />
       </button>
@@ -67,11 +93,10 @@ export default function GlobalControls({
       </button>
 
       {roundNumber > totalRounds && (
-        <button className="global-control-button" onClick={(e) => { e.currentTarget.blur(); setShowOuttakes(true); }}>
+        <button className="global-control-button" onClick={handleOuttakesClick}>
           <img src="/buttons/outtakes.png" alt="Play Outtakes" className="main-btn-img" />
         </button>
       )}
     </div>
   );
 }
-

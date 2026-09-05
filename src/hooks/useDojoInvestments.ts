@@ -30,7 +30,7 @@ export function useDojoInvestments(initialPlayers: Player[], totalRounds: number
     const initialMajority: Record<string, number> = {};
     
     DOJO_NAMES.forEach(name => {
-      initialInvestments[name] = new Array(initialPlayers.length).fill(0);
+      initialInvestments[name] = Array.from({ length: initialPlayers.length }, () => 0);
       initialTiers[name] = 0;
       initialMajority[name] = -1;
     });
@@ -101,4 +101,5 @@ export function useDojoInvestments(initialPlayers: Player[], totalRounds: number
 
   return { state, handleUpdate, getTotalInvestment };
 }
+
 

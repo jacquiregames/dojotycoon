@@ -312,3 +312,4 @@
   50% { opacity: 1; transform: translate(calc(-50% + var(--sx)), calc(-50% + var(--sy))) scale(1.2); }
   100% { opacity: 0; transform: translate(calc(-50% + var(--sx) * 1.4), calc(-50% + var(--sy) * 1.4)) scale(0); }
 }
+

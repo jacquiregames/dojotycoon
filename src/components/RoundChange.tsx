@@ -42,11 +42,21 @@ export default function RoundChange({ currentRound, totalRounds, onComplete }: R
 
   // Attempt to play the video forcefully if React's autoPlay prop hits a browser quirk
   useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.play().catch(e => {
+    const videoElement = videoRef.current;
+    if (videoElement) {
+      videoElement.play().catch(e => {
         console.warn("Video autoplay prevented by browser policies:", e);
       });
     }
+
+    // MEMORY LEAK FIX: Dump video buffer on unmount
+    return () => {
+      if (videoElement) {
+        videoElement.pause();
+        videoElement.removeAttribute('src');
+        videoElement.load();
+      }
+    };
   }, []);
 
   useEffect(() => {
@@ -193,4 +203,5 @@ export default function RoundChange({ currentRound, totalRounds, onComplete }: R
     </div>
   );
 }
+
 

@@ -9,7 +9,7 @@ align-items: center;
 justify-content: center;
 background: rgba(0, 0, 0, 0.7);
 backdrop-filter: blur(12px);
-z-index: 300; /* Ensures it sits above TeamView and GameTracker */
+z-index: var(--z-cinematic);
 }
 
 .coins-overlay {
@@ -19,7 +19,7 @@ z-index: 300; /* Ensures it sits above TeamView and GameTracker */
   width: 100vw;
   height: 100vh;
   object-fit: cover;
-  z-index: 3000;
+  z-index: var(--z-cinematic);
   pointer-events: none; /* Prevents it from blocking clicks */
 }
 
@@ -443,4 +443,5 @@ z-index: 300; /* Ensures it sits above TeamView and GameTracker */
   font-family: var(--font-julee, sans-serif);
   gap: 10px;
 }
+
 

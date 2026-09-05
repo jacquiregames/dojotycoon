@@ -1,5 +1,4 @@
-// src/components/TrialVideoOverlay.tsx
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react'; // Added useRef
 import { motion, AnimatePresence } from 'motion/react';
 import type { RandomizerMode } from '../types';
 
@@ -14,15 +13,8 @@ interface TrialVideoOverlayProps {
 }
 
 export default function TrialVideoOverlay({ step, mode, itemIdentifier, status, setStatus }: TrialVideoOverlayProps) {
-  // Check if a specific trial video exists.
-  // NOTE: `status` is intentionally NOT a dependency here even though the
-  // guard below reads it. This should only run once per revealed trial
-  // card (keyed on itemIdentifier). If `status` were a dependency, our own
-  // setStatus('checking') call would immediately re-trigger this effect,
-  // and the abort-on-cleanup below would cancel the fetch we just started
-  // before it could ever resolve - leaving status stuck on 'checking'
-  // forever (no trial video, and anything waiting on trialVideoStatus
-  // === 'done' to auto-open, like Keno/Roulette/Boss, never fires).
+  const videoRef = useRef<HTMLVideoElement>(null); // NEW: Reference for the video
+
   useEffect(() => {
     if (step === 'result' && mode === 'trials' && itemIdentifier && status === 'idle') {
       setStatus('checking');
@@ -40,8 +32,19 @@ export default function TrialVideoOverlay({ step, mode, itemIdentifier, status, 
 
       return () => controller.abort();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step, mode, itemIdentifier, setStatus]);
+
+  // NEW: Memory leak fix - dump the video buffer when unmounting
+  useEffect(() => {
+    const videoElement = videoRef.current;
+    return () => {
+      if (videoElement) {
+        videoElement.pause();
+        videoElement.removeAttribute('src');
+        videoElement.load();
+      }
+    };
+  }, [status]); // Run cleanup when status changes (which unmounts the video)
 
   return (
     <AnimatePresence>
@@ -54,6 +57,7 @@ export default function TrialVideoOverlay({ step, mode, itemIdentifier, status, 
           onClick={() => setStatus('done')}
         >
           <video
+            ref={videoRef} // NEW: Attach the ref
             src={`/trialvideos/${itemIdentifier}.mp4`}
             autoPlay
             playsInline

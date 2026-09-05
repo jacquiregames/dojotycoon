@@ -14,24 +14,24 @@ interface BossDamageTrackerProps {
   isActive: boolean;
 }
  
-const ROUNDS = [1, 2, 3];
+const BOSS_ROUNDS_COUNT = 3;
+const ROUNDS = Array.from({ length: BOSS_ROUNDS_COUNT }, (_, i) => i + 1);
 
 type Grid = (number | null)[][];
 type ModalState = 'none' | 'success' | 'fail';
 
 export default function BossDamageTracker({ players, initialHealth, bossId, onClose, isActive }: BossDamageTrackerProps) {
-  const pCount = players.length;
-  const TOTAL_ENTRIES = pCount * 3; // Dynamically 9 or 12
+  const pCount = players.length; 
+  const TOTAL_ENTRIES = pCount * BOSS_ROUNDS_COUNT;  
+  const [grid, setGrid] = useState<Grid>(() => 
+    Array.from({ length: pCount }, () => Array(BOSS_ROUNDS_COUNT).fill(null))
+  );
 
   const entryToCell = useCallback((entryIndex: number): [number, number] => {
     const col = Math.floor(entryIndex / pCount);
     const row = entryIndex % pCount;
     return [row, col];
   }, [pCount]);
-
-  const [grid, setGrid] = useState<Grid>(() => 
-    Array.from({ length: pCount }, () => [null, null, null])
-  );
 
   const [introPlaying, setIntroPlaying] = useState(!!bossId);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -40,11 +40,9 @@ export default function BossDamageTracker({ players, initialHealth, bossId, onCl
   const [entryCount, setEntryCount] = useState(0);   
   const [inputBuffer, setInputBuffer] = useState(''); 
   const [modal, setModal] = useState<ModalState>('none');
-  
-  // Prevents players from typing or double-submitting while the final animation plays
+   
   const isEvaluatingRef = useRef(false);
-
-  // Handle playing the intro and automatically transitioning to keypad
+ 
   useEffect(() => {
     if (!introPlaying || !bossId || !isActive) return;
     if (videoRef.current) {
@@ -65,8 +63,7 @@ export default function BossDamageTracker({ players, initialHealth, bossId, onCl
     setInputBuffer(prev => (prev.length >= 6 ? prev : prev + digit));
   }, [introPlaying, modal]);
 
-  const submitEntry = useCallback(() => {
-    // Block submissions during intro or while animating the final hit
+  const submitEntry = useCallback(() => { 
     if (introPlaying || isEvaluatingRef.current) return;
     if (modal === 'success' || modal === 'fail') {
       onClose();
@@ -108,18 +105,13 @@ export default function BossDamageTracker({ players, initialHealth, bossId, onCl
       }, 600);
     }
   }, [introPlaying, modal, inputBuffer, entryCount, health, grid, onClose, TOTAL_ENTRIES, entryToCell]);
-
-  // Self-contained keyboard logic, routed through the central priority
-  // stack at OVERLAY tier. This always traps every key while active -
-  // matching the original behavior - so nothing beneath it (media popups,
-  // the investment grid) can react to a key while boss damage entry is open.
+ 
   const handleKeyDown = useCallback((e: KeyboardEvent): boolean => {
     e.preventDefault();
 
     const k = e.key;
     const code = e.code;
-    
-    // Check standard numbers OR explicitly check Numpad codes (bypasses NumLock issues)
+     
     let digit: string | null = null;
     if (k >= '0' && k <= '9') {
       digit = k;
@@ -166,8 +158,7 @@ export default function BossDamageTracker({ players, initialHealth, bossId, onCl
             playsInline
             className="boss-intro-video"
             onEnded={() => {
-              setIntroPlaying(false);
-              // Tell CardRandomizer the video naturally finished so it can play the music
+              setIntroPlaying(false); 
               window.dispatchEvent(new Event('bossVideoEnded')); 
             }}
           />
@@ -271,5 +262,6 @@ export default function BossDamageTracker({ players, initialHealth, bossId, onCl
     </motion.div>
   );
 }
+
 
 

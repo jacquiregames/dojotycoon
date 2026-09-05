@@ -56,7 +56,7 @@ export default function DojoBonusSidebar({ step, mode, revealedCard, gameState }
   return (
     <AnimatePresence>
       <motion.div
-        className="trial-bonus-sidebar"
+        className={`trial-bonus-sidebar${eligiblePlayers.length > 0 ? ' has-bonus-players' : ''}`}
         initial={{ opacity: 0, x: -50 }}
         animate={{ opacity: 1, x: 0 }}
         exit={{ opacity: 0, x: -50 }}
@@ -93,4 +93,5 @@ export default function DojoBonusSidebar({ step, mode, revealedCard, gameState }
     </AnimatePresence>
   );
 }
+
 

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, forwardRef, useImperativeHandle } from 'react';
+import { useState, useEffect, useCallback, useRef, forwardRef, useImperativeHandle } from 'react';
 import { useMediaPopup } from '../hooks/useMediaPopup';
 import { ASSETS } from '../config/assets';
 
@@ -17,6 +17,10 @@ interface RulesPopupsProps {
 }
 
 const RulesPopups = forwardRef<RulesPopupsHandle, RulesPopupsProps>(({ playerCount }, ref) => {
+  const vampVideoRef = useRef<HTMLVideoElement>(null);
+  const boardNinjaVideoRef = useRef<HTMLVideoElement>(null);
+  const argueVideoRef = useRef<HTMLVideoElement>(null);
+
   const [vampVideoIndex, setVampVideoIndex] = useState(0);
   const [boardNinjaVideoIndex, setBoardNinjaVideoIndex] = useState(0);
   const [argueVideoIndex, setArgueVideoIndex] = useState(0);
@@ -89,6 +93,22 @@ const RulesPopups = forwardRef<RulesPopupsHandle, RulesPopupsProps>(({ playerCou
     };
   }, [boardNinjaPopup.state]);
 
+  useEffect(() => {
+    const vampEl = vampVideoRef.current;
+    const ninjaEl = boardNinjaVideoRef.current;
+    const argueEl = argueVideoRef.current;
+
+    return () => {
+      [vampEl, ninjaEl, argueEl].forEach(el => {
+        if (el) {
+          el.pause();
+          el.removeAttribute('src');
+          el.load();
+        }
+      });
+    };
+  }, [vampPopup.state, boardNinjaPopup.state, arguePopup.state]);
+
   return (
     <>
       {/* Conditionally mounting <video> tags fully removes them from memory decoding slots */}
@@ -99,6 +119,7 @@ const RulesPopups = forwardRef<RulesPopupsHandle, RulesPopupsProps>(({ playerCou
           )}
           {vampPopup.state === 'video' && (
             <video
+              ref={vampVideoRef}
               src={`/vamprules/${VAMP_VIDEOS[vampVideoIndex]}`}
               autoPlay playsInline preload="auto"
               className="vamp-media"
@@ -116,6 +137,7 @@ const RulesPopups = forwardRef<RulesPopupsHandle, RulesPopupsProps>(({ playerCou
           )}
           {boardNinjaPopup.state === 'video' && (
             <video
+              ref={boardNinjaVideoRef}
               src={`/ninjarules/${BOARD_NINJA_VIDEOS[boardNinjaVideoIndex]}`}
               autoPlay playsInline preload="auto"
               className="vamp-media"
@@ -133,6 +155,7 @@ const RulesPopups = forwardRef<RulesPopupsHandle, RulesPopupsProps>(({ playerCou
           )}
           {arguePopup.state === 'video' && (
             <video
+              ref={argueVideoRef}
               src={`/argue/${ARGUE_VIDEOS[argueVideoIndex]}`}
               autoPlay playsInline preload="auto"
               className="vamp-media"
@@ -148,3 +171,4 @@ const RulesPopups = forwardRef<RulesPopupsHandle, RulesPopupsProps>(({ playerCou
 
 RulesPopups.displayName = 'RulesPopups';
 export default RulesPopups;
+

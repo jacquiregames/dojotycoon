@@ -1,9 +1,6 @@
 import { DOJO_NAMES } from '../types';
 import type { DojoName } from '../types';
 
-// Per-dojo total investment cap. Matches the Tier Range Guide images shown
-// in GlobalControls.tsx - the second number in each filename is this max
-// (e.g. 300600.png = 3-player/10-round game, capped at $600).
 export const MAX_INVESTMENT_BY_CONFIG: Record<3 | 4, Record<10 | 15, number>> = {
   3: { 10: 600, 15: 800 },
   4: { 10: 800, 15: 990 },
@@ -13,20 +10,13 @@ export const GAME_CONFIG = {
   MAX_INVESTMENT: 990,
 };
 
-// Per-dojo investment totals needed to reach Tier 1 / Tier 2. (Tier 3's
-// threshold is player-count-dependent - see tier3Threshold in
-// useDojoInvestments.ts.) Shared here so useDojoInvestments' tier
-// calculation and DojoBonusSidebar's "who gets the bonus" check
-// (>= Tier 2) can't drift out of sync with each other.
+ 
 export const TIER_THRESHOLDS = {
   TIER_1: 10,
   TIER_2: 100,
 } as const;
 
-// Only 3/4 players and 10/15 rounds are ever selectable on the landing
-// screen, so the lookup above is exhaustive in practice - but this stays
-// defensive (falls back to the flat cap) rather than throwing if that
-// ever changes.
+ 
 export function getMaxInvestment(playerCount: number, totalRounds: number): number {
   const byPlayerCount = MAX_INVESTMENT_BY_CONFIG[playerCount as 3 | 4];
   return byPlayerCount?.[totalRounds as 10 | 15] ?? GAME_CONFIG.MAX_INVESTMENT;
@@ -202,8 +192,7 @@ const RAW_TRIAL_DATA: Record<number, string[]> = {
   74: ['3p','d8', 'd10', 'd12', 'Climbing', 'boss', '130'],
   75: ['3p','d4', 'Arcane', 'boss', '18'],
 }; 
-
-// We will construct these programmatically so the React components don't have to change
+ 
 export const trialDiceData: Record<number, DiceImage[]> = {};
 
 export const TRIAL_OPTIONS: Array<{
@@ -215,22 +204,28 @@ export const TRIAL_OPTIONS: Array<{
   bossHealth?: number;
 }> = [];
 
-// Parse the unified RAW_TRIAL_DATA table
+// Type-guard for DojoName
+function isDojoName(value: any): value is DojoName {
+  return DOJO_NAMES.includes(value as DojoName);
+}
+ 
 Object.entries(RAW_TRIAL_DATA).forEach(([key, arr]) => {
   const id = parseInt(key, 10);
-  
-  // Find where the DojoName is in the array. Everything before it is dice, everything after it is config.
-  const dojoIndex = arr.findIndex(item => (DOJO_NAMES as readonly string[]).includes(item));
+   
+  const dojoIndex = arr.findIndex(item => isDojoName(item));
   
   if (dojoIndex !== -1) {
-    // NEW: slice(1) to skip the 'both' / '3p' / '4p' string!
     const dice = arr.slice(1, dojoIndex) as DiceImage[];
-    const dojo = arr[dojoIndex] as DojoName;
+    const dojo = arr[dojoIndex];  
+    if (!isDojoName(dojo)) {
+      console.error(`Invalid Dojo name found in trial data for ID ${id}: ${dojo}`);
+      return; 
+    }
+
     const trialType = arr[dojoIndex + 1];
     const bossHealthStr = arr[dojoIndex + 2];
     const bossHealth = bossHealthStr ? parseInt(bossHealthStr, 10) : undefined;
-
-    // Populate the objects that React imports
+ 
     trialDiceData[id] = dice;
     TRIAL_OPTIONS.push({
       id,
@@ -242,4 +237,3 @@ Object.entries(RAW_TRIAL_DATA).forEach(([key, arr]) => {
     });
   }
 });
-

@@ -13,24 +13,24 @@
 }
 
 
-/* Define custom properties for fonts for consistency */
 :root {
+  /* Z-Index Architecture */
+  --z-background: -1;
+  --z-base: 10;
+  --z-ui-controls: 50;
+  --z-overlay: 100;
+  --z-modal: 250;
+  --z-cinematic: 3000;
+  
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
-  --font-display: "MyCustomFontName", "Space Grotesk", sans-serif; 
-  /* Additional custom fonts */
+  --font-display: "MyCustomFontName", "Space Grotesk", sans-serif;  
   --font-julee: "Julee", sans-serif;
   --font-august: "August", sans-serif;
 }
+ 
 
-/* Respect the OS-level "reduce motion" preference (e.g. vestibular
-   sensitivity) across every animation/transition in the app - the wheel
-   spin, card shuffles/flips, boss damage flashes, jackpot counters, round
-   change stingers, etc. This is a blanket override rather than editing
-   every component's CSS individually, so nothing added later is missed.
-   JS-driven animations (requestAnimationFrame loops, setTimeout-sequenced
-   reveals) aren't touched by CSS and are handled per-hook/component via
-   usePrefersReducedMotion instead - see src/hooks/usePrefersReducedMotion.ts. */
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -41,5 +41,6 @@
     scroll-behavior: auto !important;
   }
 }
+
 
 
