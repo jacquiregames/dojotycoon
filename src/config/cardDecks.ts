@@ -69,7 +69,7 @@ export type DiceImage = 'd4' | 'd6' | 'd8' | 'd10' | 'd12' | 'd20' | '2d6' | '3d
 export const ROUND_TRIAL_MAP_15R_3P: Record<number, number[]> = {
   1: [52,53,55,58,59,60,61,62], //ninja stuff
   2: [1,2,3,4,5,6], //f4ah
-  3: [76,77,78,79,80,81], //gauntlet
+  3: [44,45,46,47,48,49], //gauntlet
   4: [63,64,65,66,67,68,69], //2v1
   5: [70,71,72,73,74,75], //boss
   6: [52,53,55,58,59,60,61,62], //ninja stuff
@@ -80,14 +80,14 @@ export const ROUND_TRIAL_MAP_15R_3P: Record<number, number[]> = {
   11: [1,2,3,4,5,6], //f4ah
   12: [50,51], //ladder
   13: [63,64,65,66,67,68,69], //2v1
-  14: [76,77,78,79,80,81], //gauntlet
+  14: [44,45,46,47,48,49], //gauntlet
   15: [52,53,55,58,59,60,61,62], //ninja stuff
 };
 export const ROUND_TRIAL_MAP_10R_3P: Record<number, number[]> = { 
   1: [52,53,55,58,59,60,61,62], //ninja stuff
   2: [1,2,3,4,5,6], //f4ah
   3: [56,57],  //keno-roulette
-  4: [76,77,78,79,80,81], //gauntlet
+  4: [44,45,46,47,48,49], //gauntlet
   5: [70,71,72,73,74,75], //boss
   6: [63,64,65,66,67,68,69], //2v1
   7: [20,21,22,23,24,25], //race

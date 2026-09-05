@@ -120,7 +120,7 @@ export default function CardRandomizer({ allPlayers, mode, onClose, onSubMode, i
       baseCards = available.map(o => ({ itemIdentifier: o.image, content: { type: 'prize', prizeValue: o.value, prizeImage: o.image } }));
     }
     else if (mode === 'trials') {
-      let options = TRIAL_OPTIONS;
+      let roundOptions = TRIAL_OPTIONS;
       
       let ROUND_TRIAL_MAP;
       if (allPlayers.length === 3) {
@@ -130,10 +130,16 @@ export default function CardRandomizer({ allPlayers, mode, onClose, onSubMode, i
       }
       if (extraPropsObj?.roundNumber && ROUND_TRIAL_MAP[extraPropsObj.roundNumber]) {
         const validIds = ROUND_TRIAL_MAP[extraPropsObj.roundNumber];
-        options = options.filter(o => validIds.includes(o.id));
+        const filtered = TRIAL_OPTIONS.filter(o => validIds.includes(o.id));
+        // Guard against a round map referencing ids that don't exist in
+        // TRIAL_OPTIONS (a data typo) - fall back to the full trial pool
+        // rather than silently ending up with zero cards to draw from.
+        roundOptions = filtered.length > 0 ? filtered : TRIAL_OPTIONS;
       }
-      let available = options.filter(o => !(drawnCards?.trials || []).includes(o.id));
-      if (available.length === 0) available = options; 
+      // If every trial in this round's pool has already been drawn, reuse
+      // that same round-appropriate pool rather than the entire deck.
+      let available = roundOptions.filter(o => !(drawnCards?.trials || []).includes(o.id));
+      if (available.length === 0) available = roundOptions; 
       
       baseCards = available.map(o => ({ itemIdentifier: o.id, content: { type: 'prize', prizeValue: o.value, prizeImage: o.image, dojo: o.dojo, trialType: o.trialType, bossHealth: o.bossHealth } }));
     }
