@@ -76,12 +76,12 @@ export default function TeamView({ selected, mode, onClose, autoMinimize, onMini
       const tP4 = selected[3];
       return {
         leftTeamImages: [
-          { src: `/ninjas/1p/${colorToLetter[tP1.color]}3.png`, alt: "Player 1", className: "tourny-p1" },
-          { src: `/ninjas/1p/${colorToLetter[tP3.color]}3.png`, alt: "Player 3", className: "tourny-p3" },
+          { src: `/images/ninjas/${colorToLetter[tP1.color]}3.png`, alt: "Player 1", className: "tourny-p1" },
+          { src: `/images/ninjas/${colorToLetter[tP3.color]}3.png`, alt: "Player 3", className: "tourny-p3" },
         ],
         rightTeamImages: [
-          { src: `/ninjas/1p/${colorToLetter[tP2.color]}3.png`, alt: "Player 2", className: "tourny-p2" },
-          { src: `/ninjas/1p/${colorToLetter[tP4.color]}3.png`, alt: "Player 4", className: "tourny-p4" },
+          { src: `/images/ninjas/${colorToLetter[tP2.color]}3.png`, alt: "Player 2", className: "tourny-p2" },
+          { src: `/images/ninjas/${colorToLetter[tP4.color]}3.png`, alt: "Player 4", className: "tourny-p4" },
         ],
       };
     }
@@ -92,24 +92,24 @@ export default function TeamView({ selected, mode, onClose, autoMinimize, onMini
       return {
         leftTeamImages: [
           {
-            src: `/ninjas/1p/${colorToLetter[team1[0].color]}1.png`,
+            src: `/images/ninjas/${colorToLetter[team1[0].color]}1.png`,
             alt: "Team 1 Player 1",
             className: "team3v1-p1",
           },
           {
-            src: `/ninjas/1p/${colorToLetter[team1[1].color]}2.png`,
+            src: `/images/ninjas/${colorToLetter[team1[1].color]}2.png`,
             alt: "Team 1 Player 2",
             className: "team3v1-p2",
           },
           {
-            src: `/ninjas/1p/${colorToLetter[team1[2].color]}3.png`,
+            src: `/images/ninjas/${colorToLetter[team1[2].color]}3.png`,
             alt: "Team 1 Player 3",
             className: "team3v1-p3",
           },
         ],
         rightTeamImages: [
           {
-            src: `/ninjas/1p/${colorToLetter[team2[0].color]}1.png`,
+            src: `/images/ninjas/${colorToLetter[team2[0].color]}1.png`,
             alt: "Team 2 Player 4",
             className: "team3v1-p4",
           },
@@ -122,11 +122,11 @@ export default function TeamView({ selected, mode, onClose, autoMinimize, onMini
       const team2 = selected.slice(2, 3);
       return {
         leftTeamImages: [
-          { src: `/ninjas/1p/${colorToLetter[team1[0].color]}1.png`, alt: "Team 1 Player 1", className: "team-p1-front" },
-          { src: `/ninjas/1p/${colorToLetter[team1[1].color]}2.png`, alt: "Team 1 Player 2", className: "team-p2-behind" },
+          { src: `/images/ninjas/${colorToLetter[team1[0].color]}1.png`, alt: "Team 1 Player 1", className: "team-p1-front" },
+          { src: `/images/ninjas/${colorToLetter[team1[1].color]}2.png`, alt: "Team 1 Player 2", className: "team-p2-behind" },
         ],
         rightTeamImages: [
-          { src: `/ninjas/1p/${colorToLetter[team2[0].color]}1.png`, alt: "Team 2 Player 3", className: "team-p4-front" },
+          { src: `/images/ninjas/${colorToLetter[team2[0].color]}1.png`, alt: "Team 2 Player 3", className: "team-p4-front" },
         ],
       };
     }
@@ -136,12 +136,12 @@ export default function TeamView({ selected, mode, onClose, autoMinimize, onMini
     const team2 = selected.slice(2, 4);
     return {
       leftTeamImages: [
-        { src: `/ninjas/1p/${colorToLetter[team1[0].color]}1.png`, alt: `Player 1`, className: "team-p1-front" },
-        { src: `/ninjas/1p/${colorToLetter[team1[1].color]}2.png`, alt: `Player 2`, className: "team-p2-behind" },
+        { src: `/images/ninjas/${colorToLetter[team1[0].color]}1.png`, alt: `Player 1`, className: "team-p1-front" },
+        { src: `/images/ninjas/${colorToLetter[team1[1].color]}2.png`, alt: `Player 2`, className: "team-p2-behind" },
       ],
       rightTeamImages: [
-        { src: `/ninjas/1p/${colorToLetter[team2[0].color]}2.png`, alt: `Player 3`, className: "team-p3-behind" },
-        { src: `/ninjas/1p/${colorToLetter[team2[1].color]}1.png`, alt: `Player 4`, className: "team-p4-front" },
+        { src: `/images/ninjas/${colorToLetter[team2[0].color]}2.png`, alt: `Player 3`, className: "team-p3-behind" },
+        { src: `/images/ninjas/${colorToLetter[team2[1].color]}1.png`, alt: `Player 4`, className: "team-p4-front" },
       ],
     };
   }, [selected, mode]);
@@ -151,7 +151,7 @@ export default function TeamView({ selected, mode, onClose, autoMinimize, onMini
       <div className={`vs-container ${isReady ? "show" : ""} ${mode === "3v1" ? "mode-3v1" : ""} ${mode === "tourny" ? "mode-tourny" : ""}`}>
         
         <video autoPlay loop muted playsInline className="team-view-bg-video">
-          <source src="/backgrounds/teamview.mp4" type="video/mp4" />
+          <source src="/videos/backgrounds/teamview.mp4" type="video/mp4" />
         </video>
 
         <div className="team-display left">
@@ -171,11 +171,11 @@ export default function TeamView({ selected, mode, onClose, autoMinimize, onMini
         <div className={`vs ${mode === "3v1" ? "vs-3v1" : ""} ${mode === "2v1" ? "vs-2v1" : ""} ${mode === "tourny" ? "vs-tourny" : ""}`}>
           {mode === "tourny" ? (
             <>
-              <img src="/vs.png" alt="vs" className="tourny-vs1" />
-              <img src="/vs.png" alt="vs" className="tourny-vs2" />
+              <img src="/images/ninjas/vs.png" alt="vs" className="tourny-vs1" />
+              <img src="/images/ninjas/vs.png" alt="vs" className="tourny-vs2" />
             </>
           ) : (
-            <img src="/vs.png" alt="vs" /> 
+            <img src="/images/ninjas/vs.png" alt="vs" /> 
           )}
         </div>
 
@@ -196,5 +196,3 @@ export default function TeamView({ selected, mode, onClose, autoMinimize, onMini
     </div>
   );
 }
-
-

@@ -67,5 +67,3 @@ export const DOJO_COLOR_MAP: Record<DojoName, string> = {
   'Arcane': '#bf00ff',
   'Ninja Stuff': '#00ffff'
 };
-
-

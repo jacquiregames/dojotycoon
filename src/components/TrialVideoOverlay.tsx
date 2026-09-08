@@ -18,7 +18,7 @@ export default function TrialVideoOverlay({ step, mode, itemIdentifier, status, 
   useEffect(() => {
     if (step === 'result' && mode === 'trials' && itemIdentifier && status === 'idle') {
       setStatus('checking');
-      const videoUrl = `/trialvideos/${itemIdentifier}.mp4`;
+      const videoUrl = `/videos/trialvideos/${itemIdentifier}.mp4`;
       const controller = new AbortController();
 
       fetch(videoUrl, { method: 'HEAD', signal: controller.signal })
@@ -34,14 +34,25 @@ export default function TrialVideoOverlay({ step, mode, itemIdentifier, status, 
     }
   }, [step, mode, itemIdentifier, setStatus]);
 
-  // NEW: Memory leak fix - dump the video buffer when unmounting
+  // Pause on unmount to stop network activity immediately. (Previously
+  // this also stripped the src via removeAttribute()+load(), but that
+  // broke playback under StrictMode's dev-mode double-invoke - see the
+  // identical fix note in LandingPage.tsx for the full explanation.)
   useEffect(() => {
     const videoElement = videoRef.current;
+
+    // Explicitly (re-)start playback rather than relying solely on the
+    // autoPlay attribute, which only fires once at DOM insertion -
+    // StrictMode's double-invoke (mount -> cleanup -> mount again) would
+    // otherwise leave the video paused via the pause() below with nothing
+    // left to resume it.
+    if (videoElement) {
+      videoElement.play().catch(() => {});
+    }
+
     return () => {
       if (videoElement) {
         videoElement.pause();
-        videoElement.removeAttribute('src');
-        videoElement.load();
       }
     };
   }, [status]); // Run cleanup when status changes (which unmounts the video)
@@ -58,7 +69,7 @@ export default function TrialVideoOverlay({ step, mode, itemIdentifier, status, 
         >
           <video
             ref={videoRef} // NEW: Attach the ref
-            src={`/trialvideos/${itemIdentifier}.mp4`}
+            src={`/videos/trialvideos/${itemIdentifier}.mp4`}
             autoPlay
             playsInline
             className="trial-video-media"

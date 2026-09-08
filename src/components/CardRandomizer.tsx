@@ -173,16 +173,16 @@ export default function CardRandomizer({ allPlayers, mode, onClose, onSubMode, i
   const exampleImage = useMemo(() => {
     if (step !== 'result' || mode !== 'trials' || !revealedCard) return null;
     const id = Number(revealedCard.itemIdentifier);
-    if ([20, 21, 22, 23, 24, 25].includes(id)) return '/example/20_21_22_23_24_25.png';
-    if ([44, 46, 48].includes(id)) return '/example/44_46_48.png';
-    if ([45, 47, 49].includes(id)) return '/example/45_47_49.png';
-    if (id === 50) return '/example/50.png';
-    if (id === 51) return '/example/51.png';
-    if (id === 53) return '/example/53.png';
-    if (id === 55) return '/example/55.png';
-    if (id === 58) return '/example/58.png';
-    if (id === 60) return '/example/60.png';
-    if (id === 62) return '/example/62.png';
+    if ([20, 21, 22, 23, 24, 25].includes(id)) return '/images/example/20_21_22_23_24_25.png';
+    if ([44, 46, 48].includes(id)) return '/images/example/44_46_48.png';
+    if ([45, 47, 49].includes(id)) return '/images/example/45_47_49.png';
+    if (id === 50) return '/images/example/50.png';
+    if (id === 51) return '/images/example/51.png';
+    if (id === 53) return '/images/example/53.png';
+    if (id === 55) return '/images/example/55.png';
+    if (id === 58) return '/images/example/58.png';
+    if (id === 60) return '/images/example/60.png';
+    if (id === 62) return '/images/example/62.png';
     return null;
   }, [step, mode, revealedCard]);
 
@@ -304,7 +304,7 @@ export default function CardRandomizer({ allPlayers, mode, onClose, onSubMode, i
   const getCardImageUrl = (cardContent: Card['content']) => {
     if (!cardContent) return '';
     switch (cardContent.type) {
-        case 'player': return cardContent.player ? `/heads/${cardContent.player.color}.png` : '';
+        case 'player': return cardContent.player ? `/images/heads/${cardContent.player.color}.png` : '';
         case 'wager': return cardContent.wagerImage || '';
         case 'prize': return cardContent.prizeImage || '';
         default: return '';
@@ -449,7 +449,7 @@ export default function CardRandomizer({ allPlayers, mode, onClose, onSubMode, i
             }}
           >
             <video
-              src={mode === 'prize-green' ? `/prize-green/${GREEN_VIDEOS[greenPrizeVideoIndex]}` : `/prize-red/${RED_VIDEOS[redPrizeVideoIndex]}`}
+              src={mode === 'prize-green' ? `/videos/prize-green/${GREEN_VIDEOS[greenPrizeVideoIndex]}` : `/videos/prize-red/${RED_VIDEOS[redPrizeVideoIndex]}`}
               autoPlay
               playsInline
               className="prize-exit-video"
@@ -462,5 +462,3 @@ export default function CardRandomizer({ allPlayers, mode, onClose, onSubMode, i
     </motion.div>
   );
 }
-
-

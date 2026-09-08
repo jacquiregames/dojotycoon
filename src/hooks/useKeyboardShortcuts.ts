@@ -170,5 +170,3 @@ export function useKeyboardShortcuts({
 
   useKeyRouterLayer(KEY_LAYERS.BASE, handleKeyDown, active);
 }
-
-

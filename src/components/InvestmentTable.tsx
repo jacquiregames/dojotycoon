@@ -79,9 +79,9 @@ export default function InvestmentTable({
             const tier = state.dojoTiers[dojoName];
             
             let dojoImageSrc = '';
-            if (tier === 1) dojoImageSrc = `/tier/${getDojoFilename(dojoName)}1.png`;
-            else if (tier === 2) dojoImageSrc = `/tier/${getDojoFilename(dojoName)}2.png`;
-            else if (tier === 3) dojoImageSrc = `/tier/${getDojoFilename(dojoName)}3.png`;
+            if (tier === 1) dojoImageSrc = `/images/tier/${getDojoFilename(dojoName)}1.png`;
+            else if (tier === 2) dojoImageSrc = `/images/tier/${getDojoFilename(dojoName)}2.png`;
+            else if (tier === 3) dojoImageSrc = `/images/tier/${getDojoFilename(dojoName)}3.png`;
 
             const investments = state.investments[dojoName];
 
@@ -121,7 +121,7 @@ export default function InvestmentTable({
                           <AnimatedValue value={investmentValue} prefix="$" className="value-text" />
                           {isMajority && (
                             <div className={`majority-tier-badge ${tier === 0 ? 'text-badge' : ''}`}>
-                              {tier > 0 ? <img src={`/banners/${tier}.png`} alt={`Tier ${tier}`} /> : tier}
+                              {tier > 0 ? <img src={`/images/banners/${tier}.png`} alt={`Tier ${tier}`} /> : tier}
                             </div>
                           )}
                           {isMajority && dojoImageSrc && (
@@ -141,5 +141,3 @@ export default function InvestmentTable({
     </div>
   );
 }
-
-

@@ -101,5 +101,3 @@ export function useDojoInvestments(initialPlayers: Player[], totalRounds: number
 
   return { state, handleUpdate, getTotalInvestment };
 }
-
-

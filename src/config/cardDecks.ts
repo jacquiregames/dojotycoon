@@ -23,35 +23,35 @@ export function getMaxInvestment(playerCount: number, totalRounds: number): numb
 }
 
 export const WAGER_OPTIONS = [ 
-  { value: '$30', image: '/wager/30d.webp' },
-  { value: '$50', image: '/wager/50d.webp' },
-  { value: '50%', image: '/wager/50p.webp' },
-  { value: '$100', image: '/wager/100d.webp' }, 
-  { value: '100%', image: '/wager/100p.webp' },
-  { value: '$150', image: '/wager/150d.webp' }, 
-  { value: '$200', image: '/wager/200d.webp' }, 
-  { value: '1 Honor', image: '/wager/1honor.webp' },
+  { value: '$30', image: '/images/wager/30d.webp' },
+  { value: '$50', image: '/images/wager/50d.webp' },
+  { value: '50%', image: '/images/wager/50p.webp' },
+  { value: '$100', image: '/images/wager/100d.webp' }, 
+  { value: '100%', image: '/images/wager/100p.webp' },
+  { value: '$150', image: '/images/wager/150d.webp' }, 
+  { value: '$200', image: '/images/wager/200d.webp' }, 
+  { value: '1 Honor', image: '/images/wager/1honor.webp' },
 ];
 
 export const GREEN_PRIZE_OPTIONS = [
-  { value: '+$30', image: '/prize-green/plus30d.png' },
-  { value: '+$50', image: '/prize-green/plus50d.png' },
-  { value: '+50%', image: '/prize-green/plus50p.png' },
-  { value: '+$100', image: '/prize-green/plus100d.png' },
-  { value: '+100%', image: '/prize-green/plus100p.png' }, 
-  { value: '+$150', image: '/prize-green/plus150d.png' },
-  { value: '+$200', image: '/prize-green/plus200d.png' },
-  { value: '+1 Honor', image: '/prize-green/plus1honor.png' },
+  { value: '+$30', image: '/images/prize-green/plus30d.png' },
+  { value: '+$50', image: '/images/prize-green/plus50d.png' },
+  { value: '+50%', image: '/images/prize-green/plus50p.png' },
+  { value: '+$100', image: '/images/prize-green/plus100d.png' },
+  { value: '+100%', image: '/images/prize-green/plus100p.png' }, 
+  { value: '+$150', image: '/images/prize-green/plus150d.png' },
+  { value: '+$200', image: '/images/prize-green/plus200d.png' },
+  { value: '+1 Honor', image: '/images/prize-green/plus1honor.png' },
 ];
 
 export const RED_PRIZE_OPTIONS = [ 
-  { value: '-$30', image: '/prize-red/minus30d.png' },
-  { value: '-$50', image: '/prize-red/minus50d.png' },
-  { value: '-50%', image: '/prize-red/minus50p.png' },
-  { value: '-$100', image: '/prize-red/minus100d.png' },
-  { value: '-100%', image: '/prize-red/minus100p.png' },
-  { value: '-$150', image: '/prize-red/minus150d.png' },
-  { value: '-$200', image: '/prize-red/minus200d.png' },
+  { value: '-$30', image: '/images/prize-red/minus30d.png' },
+  { value: '-$50', image: '/images/prize-red/minus50d.png' },
+  { value: '-50%', image: '/images/prize-red/minus50p.png' },
+  { value: '-$100', image: '/images/prize-red/minus100d.png' },
+  { value: '-100%', image: '/images/prize-red/minus100p.png' },
+  { value: '-$150', image: '/images/prize-red/minus150d.png' },
+  { value: '-$200', image: '/images/prize-red/minus200d.png' },
 ];
 
 export type DiceImage = 'd4' | 'd6' | 'd8' | 'd10' | 'd12' | 'd20' | '2d6' | '3d6' | '5d6' | 'd412' | 'd620' | 'd820' | 'dq' | 'dall';
@@ -230,7 +230,7 @@ Object.entries(RAW_TRIAL_DATA).forEach(([key, arr]) => {
     TRIAL_OPTIONS.push({
       id,
       value: `Trial ${id}`,
-      image: `/trials/slide${id}.png`,
+      image: `/images/trials/slide${id}.png`,
       dojo,
       trialType,
       bossHealth

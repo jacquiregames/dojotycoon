@@ -90,7 +90,17 @@ export default function GameTracker({ initialPlayers, totalRounds }: GameTracker
     const closingMode = modeStack[modeStack.length - 1]?.mode;
     if (closingMode === 'trials') {
       setChangingRound(roundNumber);
-      setRoundNumber(prev => prev + 1);
+      if (roundNumber < totalRounds) {
+        setRoundNumber(prev => prev + 1);
+      }
+      // If this WAS the final round, roundNumber deliberately stays at
+      // totalRounds for now instead of advancing immediately - advancing
+      // it here would flip "roundNumber > totalRounds" (which triggers
+      // gameover.mp3, fireworks, etc.) on the instant the Final Boss fight
+      // begins, well before the 16.mp4 finale video actually starts.
+      // RoundChange calls onFinaleVideoStart below at the exact moment it
+      // hands off from the boss fight to 16.mp4, and that's what advances
+      // roundNumber instead.
     }
 
     const isSubModeFromTrials = modeStack.length >= 2 && modeStack[modeStack.length - 2].mode === 'trials';
@@ -192,7 +202,7 @@ export default function GameTracker({ initialPlayers, totalRounds }: GameTracker
 
       <RulesPopups ref={rulesPopupsRef} playerCount={initialPlayers.length} />
 
-      {changingRound !== null && <RoundChange currentRound={changingRound} totalRounds={totalRounds} onComplete={() => setChangingRound(null)} />}
+      {changingRound !== null && <RoundChange currentRound={changingRound} totalRounds={totalRounds} players={initialPlayers} onComplete={() => setChangingRound(null)} onFinaleVideoStart={() => setRoundNumber(prev => prev + 1)} />}
 
       {showOuttakes && (
         <div className="outtakes-video-overlay" onClick={() => setShowOuttakes(false)}>
@@ -209,5 +219,3 @@ export default function GameTracker({ initialPlayers, totalRounds }: GameTracker
     </div>
   );
 }
-
-

@@ -41,11 +41,28 @@ export default function LandingPage({ onStart }: LandingPageProps) {
   // when it disappears.
   useEffect(() => {
     const loopVideo = loopVideoRef.current;
+
+    // Explicitly (re-)start playback rather than relying solely on the
+    // autoPlay attribute. autoPlay only fires once, at DOM insertion -
+    // React's StrictMode double-invokes this effect (mount -> cleanup ->
+    // mount again) in dev, and that first cleanup's pause() below would
+    // otherwise stop the video with nothing left to resume it.
+    if (loopVideo) {
+      loopVideo.play().catch(() => {});
+    }
+
+    // Pause on unmount to stop network activity immediately, rather than
+    // waiting for garbage collection. (Previously this also called
+    // removeAttribute('src') + load() to more aggressively free the
+    // buffer, but that actively broke playback: React's StrictMode
+    // double-invokes this cleanup right after the very first mount in
+    // dev, stripping the src before the video ever had a chance to play -
+    // and since the src prop value itself never changes, React has no way
+    // to know it needs to be re-applied. Removing the DOM node on real
+    // unmount already releases the buffer; this doesn't need to help.)
     return () => {
       if (loopVideo) {
         loopVideo.pause();
-        loopVideo.removeAttribute('src');
-        loopVideo.load();
       }
     };
   }, [showStartVideo, showHowToPlayVideo]);
@@ -66,8 +83,6 @@ export default function LandingPage({ onStart }: LandingPageProps) {
       [startVideo, howToPlayVideo].forEach(el => {
         if (el) {
           el.pause();
-          el.removeAttribute('src');
-          el.load();
         }
       });
     };
@@ -187,14 +202,14 @@ export default function LandingPage({ onStart }: LandingPageProps) {
     <main className="app-shell">
       
       <button className="how-to-play-btn" onClick={handleHowToPlayClick} type="button">
-        <img src="/buttons/HowToPlay.png" alt="How to Play" />
+        <img src="/images/buttons/HowToPlay.png" alt="How to Play" />
       </button>
 
       {!showStartVideo && !showHowToPlayVideo && (
         <div className="landing-loop-video-container">
           <video 
             ref={loopVideoRef} // NEW: Attach ref to loop video
-            src="/backgrounds/landing.mp4" 
+            src="/videos/landing.mp4" 
             autoPlay 
             loop 
             muted 
@@ -208,7 +223,7 @@ export default function LandingPage({ onStart }: LandingPageProps) {
       <div className={`landing-video-overlay ${showStartVideo ? 'active' : ''}`}>
         <video 
           ref={videoRef} 
-          src="/backgrounds/start.mp4" 
+          src="/videos/backgrounds/start.mp4" 
           playsInline 
           preload="auto" 
           className="landing-video" 
@@ -239,7 +254,7 @@ export default function LandingPage({ onStart }: LandingPageProps) {
               <div className="player-row" key={`player-${index + 1}`}>
                 <div className="ninja-avatar-container" aria-hidden="true">
                   <img
-                    src={`/heads/${player.color}.png`}
+                    src={`/images/heads/${player.color}.png`}
                     alt={`${player.color} ninja`}
                     className="ninja-avatar"
                   />
@@ -287,14 +302,14 @@ export default function LandingPage({ onStart }: LandingPageProps) {
                   className={`length-toggle ${playerCount === 3 ? 'selected' : ''}`}
                   onClick={() => setPlayerCount(3)}
                 >
-                  <img src="/buttons/3p.png" alt="3 Players" />
+                  <img src="/images/buttons/3p.png" alt="3 Players" />
                 </button>
                 <button 
                   type="button"
                   className={`length-toggle ${playerCount === 4 ? 'selected' : ''}`}
                   onClick={() => setPlayerCount(4)}
                 >
-                  <img src="/buttons/4p.png" alt="4 Players" />
+                  <img src="/images/buttons/4p.png" alt="4 Players" />
                 </button>
               </div>
               <div className="toggles-col">
@@ -303,14 +318,14 @@ export default function LandingPage({ onStart }: LandingPageProps) {
                   className={`length-toggle ${totalRounds === 10 ? 'selected' : ''}`}
                   onClick={() => setTotalRounds(10)}
                 >
-                  <img src="/buttons/10rounds.png" alt="10 Rounds" />
+                  <img src="/images/buttons/10rounds.png" alt="10 Rounds" />
                 </button>
                 <button 
                   type="button"
                   className={`length-toggle ${totalRounds === 15 ? 'selected' : ''}`}
                   onClick={() => setTotalRounds(15)}
                 >
-                  <img src="/buttons/15rounds.png" alt="15 Rounds" />
+                  <img src="/images/buttons/15rounds.png" alt="15 Rounds" />
                 </button>
               </div>
             </div>
@@ -319,7 +334,7 @@ export default function LandingPage({ onStart }: LandingPageProps) {
               type="button"  
               onClick={handleStartClick}
             >
-              <img src="/buttons/startgame.png" alt="Start Game" />
+              <img src="/images/buttons/startgame.png" alt="Start Game" />
             </button>
 
           </div>
@@ -329,5 +344,3 @@ export default function LandingPage({ onStart }: LandingPageProps) {
     </main>
   );
 }
-
-

@@ -9,7 +9,7 @@
   place-items: center;
   overflow: hidden;
   padding: 32px 18px;
-  background-image: url('/backgrounds/landing.png');
+  background-image: url('/images/backgrounds/landing.png');
   background-size: 100% 100%;
   background-position: center;
   color: #f8fafc;
@@ -374,4 +374,3 @@
     font-size: 0.85rem;
   }
 }
-

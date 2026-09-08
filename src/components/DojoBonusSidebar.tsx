@@ -16,20 +16,23 @@ function DiceMedia({ dice, className }: DiceMediaProps) {
 
   // Fallback to purely using the image if the MP4 fails to load (404)
   if (hasError) {
-    return <img src={`/dice/${dice}.png`} alt={dice} className={className} />;
+    return <img src={`/videos/dice/${dice}.png`} alt={dice} className={className} />;
   }
 
-  // Attempt to play the video, using the PNG as the loading poster
+  // Attempt to play the video. There's no poster fallback image anymore
+  // (the per-dice poster PNGs were intentionally removed since the videos
+  // load reliably) - `dq` is the one exception: it has no video at all, so
+  // it deliberately 404s here and falls through to the PNG branch above,
+  // which is its actual (animated) artwork.
   return (
     <video
-      src={`/dice/${dice}.mp4`}
+      src={`/videos/dice/${dice}.mp4`}
       autoPlay
       loop
       muted
       playsInline
       className={className}
       onError={() => setHasError(true)}
-      poster={`/dice/${dice}.png`}
     />
   );
 }
@@ -93,5 +96,3 @@ export default function DojoBonusSidebar({ step, mode, revealedCard, gameState }
     </AnimatePresence>
   );
 }
-
-

@@ -22,4 +22,3 @@ export default function RandomizerBackground({ mode }: RandomizerBackgroundProps
   }
   return null;
 }
-

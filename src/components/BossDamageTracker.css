@@ -28,12 +28,42 @@
   background: none;
 }
 
+/* --- Final Boss theme ---
+   Recolors the whole tracker from its default cyan palette into the red
+   hue used by the standalone Final Boss app. Most of the file is already
+   built on the CSS variables below, so overriding them does most of the
+   work; the handful of rules further down that hardcode the cyan/pink/
+   green/amber rgba() values directly get a matching `.final-boss`
+   override right next to them so nothing is left cyan. */
+.boss-damage-tracker-overlay.final-boss {
+  --line: rgba(255, 45, 85, 0.28);
+  --line-hot: rgba(255, 106, 61, 0.6);
+  --cyan: #ff2d55;
+  --cyan-soft: rgba(255, 45, 85, 0.18);
+  --violet: #b3123a;
+  --pink: #ff6a3d;
+  --green: #ff8fa3;
+  --amber: #ffb84d;
+
+  /* The mid-game (default) variant is a fixed, full-viewport overlay -
+     the Final Boss variant instead lives inside FinalBossSequence's
+     .fbs-tracker-wrap (which reproduces the standalone Final Boss app's
+     .tracker-container position/size/animation), so it just fills that
+     box as a normal block element instead of covering the screen. */
+  position: relative;
+  inset: auto;
+  z-index: auto;
+  display: block;
+  padding: 0;
+  overflow: visible;
+}
+
 /* --- New Boss Intro Overlay Styles --- */
 .boss-intro-overlay {
   position: fixed;
   inset: 0;
   z-index: 300;
-  background-image: url('/bosses/bossbackground.png');
+  background-image: url('/images/backgrounds/bossbackground.png');
   background-size: 100% 100%;
   background-position: center;
   background-repeat: no-repeat;
@@ -497,4 +527,164 @@
   50% { box-shadow: inset 0 0 0 1px rgba(89, 241, 255, 0.78), inset 0 0 34px rgba(89, 241, 255, 0.28); }
 }
 
+/* --- Final Boss theme, part 2 ---
+   Everything above this point is already re-tinted by the CSS variable
+   overrides near the top of this file. The rules below cover the handful
+   of places that hardcode rgba() literals instead of using those
+   variables, mapped 1:1 onto the red palette:
+     cyan   rgba(89,241,255)  -> rgba(255,45,85)   (--cyan)
+     hot    rgba(255,62,139)  -> rgba(255,106,61)  (--pink)
+     green  rgba(119,255,152) -> rgba(255,143,163) (--green)
+     amber  rgba(255,209,102) -> rgba(255,184,77)  (--amber)
+     violet rgba(141,92,255)  -> rgba(179,18,58)   (--violet) */
 
+.boss-damage-tracker-overlay.final-boss::before {
+  background-image:
+    linear-gradient(rgba(255, 45, 85, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 45, 85, 0.1) 1px, transparent 1px);
+}
+
+.boss-damage-tracker-overlay.final-boss::after {
+  background:
+    radial-gradient(circle at 28% 22%, rgba(255, 45, 85, 0.13), transparent 22rem),
+    radial-gradient(circle at 80% 66%, rgba(255, 106, 61, 0.12), transparent 24rem);
+}
+
+.final-boss .boss-container::before {
+  background:
+    linear-gradient(135deg, rgba(255, 45, 85, 0.18), transparent 34%, rgba(255, 106, 61, 0.1)),
+    radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.08), transparent 26%);
+}
+
+.final-boss .health-container {
+  border-color: rgba(255, 45, 85, 0.34);
+  box-shadow:
+    0 24px 70px rgba(0, 0, 0, 0.52),
+    0 0 46px rgba(255, 45, 85, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.final-boss .health-container h1 {
+  text-shadow:
+    0 0 12px rgba(255, 45, 85, 0.65),
+    0 0 36px rgba(255, 45, 85, 0.28);
+}
+
+.final-boss .health-warning h1 {
+  text-shadow: 0 0 18px rgba(255, 184, 77, 0.55);
+}
+
+.final-boss .health-critical h1 {
+  text-shadow: 0 0 18px rgba(255, 106, 61, 0.72);
+}
+
+.final-boss .health-meter-fill {
+  box-shadow: 0 0 18px rgba(255, 45, 85, 0.45);
+}
+
+.final-boss .health-warning .health-meter-fill {
+  box-shadow: 0 0 18px rgba(255, 184, 77, 0.42);
+}
+
+.final-boss .health-critical .health-meter-fill {
+  box-shadow: 0 0 20px rgba(255, 106, 61, 0.55);
+}
+
+.final-boss .damage-table th,
+.final-boss .damage-table td {
+  border-right: 1px solid rgba(255, 45, 85, 0.14);
+  border-bottom: 1px solid rgba(255, 45, 85, 0.14);
+}
+
+.final-boss .damage-table thead th {
+  color: #ffe1e6;
+  background:
+    linear-gradient(180deg, rgba(255, 45, 85, 0.2), rgba(255, 45, 85, 0.08)),
+    rgba(46, 10, 20, 0.92);
+  text-shadow: 0 0 12px rgba(255, 45, 85, 0.36);
+}
+
+.final-boss .damage-table tbody tr:hover {
+  background: rgba(255, 45, 85, 0.08);
+}
+
+.final-boss .damage-table tbody tr:last-child {
+  background:
+    linear-gradient(90deg, rgba(255, 184, 77, 0.14), rgba(179, 18, 58, 0.12));
+}
+
+.final-boss .damage-table td.active-cell {
+  background:
+    radial-gradient(circle at center, rgba(255, 45, 85, 0.34), rgba(255, 45, 85, 0.12) 64%, transparent),
+    rgba(255, 45, 85, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(255, 45, 85, 0.56), inset 0 0 26px rgba(255, 45, 85, 0.22);
+  animation: activeCellPulseFinal 1.65s ease-in-out infinite;
+}
+
+.final-boss .damage-table td.filled-cell {
+  text-shadow: 0 0 14px rgba(255, 143, 163, 0.32);
+}
+
+.final-boss .damage-table td.total-filled {
+  text-shadow: 0 0 16px rgba(255, 184, 77, 0.35);
+}
+
+.final-boss .entry-preview {
+  text-shadow: 0 0 14px rgba(255, 45, 85, 0.55);
+}
+
+.final-boss .tracker-footer {
+  border-top: 1px solid rgba(255, 45, 85, 0.14);
+}
+
+.final-boss .tracker-status span {
+  text-shadow: 0 0 12px rgba(255, 45, 85, 0.45);
+}
+
+.final-boss .health-critical {
+  animation: dangerPulseFinal 1.15s ease-in-out infinite;
+}
+
+.final-boss .modal-overlay {
+  background:
+    radial-gradient(circle at center, rgba(255, 45, 85, 0.12), transparent 28rem),
+    rgba(1, 3, 10, 0.0);
+}
+
+.final-boss .modal-box.success {
+  border-color: rgba(255, 143, 163, 0.62);
+  box-shadow: 0 34px 90px rgba(0, 0, 0, 0.64), 0 0 54px rgba(255, 143, 163, 0.16);
+}
+
+.final-boss .modal-box.fail {
+  border-color: rgba(255, 106, 61, 0.7);
+  box-shadow: 0 34px 90px rgba(0, 0, 0, 0.64), 0 0 62px rgba(255, 106, 61, 0.2);
+}
+
+.final-boss .modal-box.success .modal-title {
+  text-shadow: 0 0 28px rgba(255, 143, 163, 0.58);
+}
+
+.final-boss .modal-box.fail .modal-title {
+  text-shadow: 0 0 28px rgba(255, 106, 61, 0.65);
+}
+
+.final-boss .modal-reset-btn {
+  border: 1px solid rgba(255, 45, 85, 0.56);
+  box-shadow: 0 0 22px rgba(255, 45, 85, 0.12);
+}
+
+.final-boss .modal-reset-btn:hover {
+  color: #1c0408;
+  box-shadow: 0 0 28px rgba(255, 45, 85, 0.34);
+}
+
+@keyframes dangerPulseFinal {
+  0%, 100% { box-shadow: 0 24px 70px rgba(0, 0, 0, 0.52), 0 0 38px rgba(255, 106, 61, 0.12); }
+  50% { box-shadow: 0 24px 70px rgba(0, 0, 0, 0.52), 0 0 58px rgba(255, 106, 61, 0.32); }
+}
+
+@keyframes activeCellPulseFinal {
+  0%, 100% { box-shadow: inset 0 0 0 1px rgba(255, 45, 85, 0.46), inset 0 0 22px rgba(255, 45, 85, 0.16); }
+  50% { box-shadow: inset 0 0 0 1px rgba(255, 45, 85, 0.78), inset 0 0 34px rgba(255, 45, 85, 0.28); }
+}

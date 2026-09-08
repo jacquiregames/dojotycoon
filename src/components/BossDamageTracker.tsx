@@ -12,6 +12,17 @@ interface BossDamageTrackerProps {
   bossId?: number;
   onClose: () => void;
   isActive: boolean;
+  // 'final' swaps the tracker into the red-hued Final Boss theme (see
+  // BossDamageTracker.css) and lets the health label be overridden.
+  variant?: 'default' | 'final';
+  healthLabel?: string;
+  // When provided, a round-transition video sequence (see
+  // FinalBossSequence.tsx) is driving this tracker: round-complete and
+  // game-end are reported here instead of showing the built-in
+  // success/fail modal, so the parent can cut to its own success/defeat
+  // video at exactly the right moment.
+  onRoundComplete?: (nextRound: number) => void;
+  onGameEnd?: (result: 'success' | 'fail') => void;
 }
  
 const BOSS_ROUNDS_COUNT = 3;
@@ -20,7 +31,8 @@ const ROUNDS = Array.from({ length: BOSS_ROUNDS_COUNT }, (_, i) => i + 1);
 type Grid = (number | null)[][];
 type ModalState = 'none' | 'success' | 'fail';
 
-export default function BossDamageTracker({ players, initialHealth, bossId, onClose, isActive }: BossDamageTrackerProps) {
+export default function BossDamageTracker({ players, initialHealth, bossId, onClose, isActive, variant = 'default', healthLabel = 'Health', onRoundComplete, onGameEnd }: BossDamageTrackerProps) {
+  const isFinal = variant === 'final';
   const pCount = players.length; 
   const TOTAL_ENTRIES = pCount * BOSS_ROUNDS_COUNT;  
   const [grid, setGrid] = useState<Grid>(() => 
@@ -94,17 +106,31 @@ export default function BossDamageTracker({ players, initialHealth, bossId, onCl
     if (newHealth <= 0) {
       isEvaluatingRef.current = true;
       setTimeout(() => {
-        setModal('success');
+        if (onGameEnd) {
+          onGameEnd('success');
+        } else {
+          setModal('success');
+        }
         isEvaluatingRef.current = false;
       }, 600);
     } else if (newEntryCount >= TOTAL_ENTRIES) {
       isEvaluatingRef.current = true;
       setTimeout(() => {
-        setModal('fail');
+        if (onGameEnd) {
+          onGameEnd('fail');
+        } else {
+          setModal('fail');
+        }
         isEvaluatingRef.current = false;
       }, 600);
+    } else if (onRoundComplete && newEntryCount % pCount === 0) {
+      // A round's worth of entries just finished (and it wasn't the final
+      // one, since that's caught above) - tell the sequence controller so
+      // it can cut to the next round's transition video.
+      const roundFinished = newEntryCount / pCount;
+      onRoundComplete(roundFinished + 1);
     }
-  }, [introPlaying, modal, inputBuffer, entryCount, health, grid, onClose, TOTAL_ENTRIES, entryToCell]);
+  }, [introPlaying, modal, inputBuffer, entryCount, health, grid, onClose, TOTAL_ENTRIES, entryToCell, onRoundComplete, onGameEnd]);
  
   const handleKeyDown = useCallback((e: KeyboardEvent): boolean => {
     e.preventDefault();
@@ -149,11 +175,11 @@ export default function BossDamageTracker({ players, initialHealth, bossId, onCl
 
   if (introPlaying && bossId) {
     return (
-      <div className="boss-intro-overlay">
+      <div className={`boss-intro-overlay ${isFinal ? 'final-boss' : ''}`}>
         <div className="boss-intro-video-container">
           <video
             ref={videoRef}
-            src={`/bosses/${bossId}.mp4`}
+            src={`/videos/bosses/${bossId}.mp4`}
             autoPlay
             playsInline
             className="boss-intro-video"
@@ -175,7 +201,7 @@ export default function BossDamageTracker({ players, initialHealth, bossId, onCl
   
   return (
     <motion.div 
-      className="boss-damage-tracker-overlay"
+      className={`boss-damage-tracker-overlay ${isFinal ? 'final-boss' : ''}`}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -190,7 +216,7 @@ export default function BossDamageTracker({ players, initialHealth, bossId, onCl
         <div className="main-row">
           <div className="left-column">
             <header className={`boss-container health-container health-${healthTone}`}> 
-              <h1>Health: {animatedHealth}</h1>
+              <h1>{healthLabel}: {animatedHealth}</h1>
               <div className="health-meter" aria-hidden="true">
                 <div className="health-meter-fill" style={{ width: `${healthPercent}%` }} />
               </div>
@@ -262,6 +288,3 @@ export default function BossDamageTracker({ players, initialHealth, bossId, onCl
     </motion.div>
   );
 }
-
-
-

@@ -45,5 +45,3 @@ export function useMediaPopup(
 
   return { state, setState, advance };
 }
-
-

@@ -93,17 +93,30 @@ const RulesPopups = forwardRef<RulesPopupsHandle, RulesPopupsProps>(({ playerCou
     };
   }, [boardNinjaPopup.state]);
 
+  // Pause on unmount to stop network activity immediately. (Previously
+  // this also stripped the src via removeAttribute()+load(), but that
+  // broke playback under StrictMode's dev-mode double-invoke - see the
+  // identical fix note in LandingPage.tsx for the full explanation.)
   useEffect(() => {
     const vampEl = vampVideoRef.current;
     const ninjaEl = boardNinjaVideoRef.current;
     const argueEl = argueVideoRef.current;
 
+    // Explicitly (re-)start playback rather than relying solely on the
+    // autoPlay attribute, which only fires once at DOM insertion -
+    // StrictMode's double-invoke (mount -> cleanup -> mount again) would
+    // otherwise leave these paused via the pause() below with nothing
+    // left to resume them.
+    [vampEl, ninjaEl, argueEl].forEach(el => {
+      if (el) {
+        el.play().catch(() => {});
+      }
+    });
+
     return () => {
       [vampEl, ninjaEl, argueEl].forEach(el => {
         if (el) {
           el.pause();
-          el.removeAttribute('src');
-          el.load();
         }
       });
     };
@@ -115,12 +128,12 @@ const RulesPopups = forwardRef<RulesPopupsHandle, RulesPopupsProps>(({ playerCou
       {vampPopup.state !== 'hidden' && (
         <div className="vamp-overlay" onClick={vampPopup.advance}>
           {vampPopup.state === 'image' && (
-            <img src={`/vamprules/vamprules${playerCount}p.png`} alt="Vampire Intro" className="vamp-media" />
+            <img src={`/images/backgrounds/vamprules${playerCount}p.png`} alt="Vampire Intro" className="vamp-media" />
           )}
           {vampPopup.state === 'video' && (
             <video
               ref={vampVideoRef}
-              src={`/vamprules/${VAMP_VIDEOS[vampVideoIndex]}`}
+              src={`/videos/vamprules/${VAMP_VIDEOS[vampVideoIndex]}`}
               autoPlay playsInline preload="auto"
               className="vamp-media"
               onEnded={() => { vampPopup.setState('hidden'); handleVampClose(); }}
@@ -138,7 +151,7 @@ const RulesPopups = forwardRef<RulesPopupsHandle, RulesPopupsProps>(({ playerCou
           {boardNinjaPopup.state === 'video' && (
             <video
               ref={boardNinjaVideoRef}
-              src={`/ninjarules/${BOARD_NINJA_VIDEOS[boardNinjaVideoIndex]}`}
+              src={`/videos/ninjarules/${BOARD_NINJA_VIDEOS[boardNinjaVideoIndex]}`}
               autoPlay playsInline preload="auto"
               className="vamp-media"
               onEnded={() => { boardNinjaPopup.setState('hidden'); handleBoardNinjaClose(); }}
@@ -156,7 +169,7 @@ const RulesPopups = forwardRef<RulesPopupsHandle, RulesPopupsProps>(({ playerCou
           {arguePopup.state === 'video' && (
             <video
               ref={argueVideoRef}
-              src={`/argue/${ARGUE_VIDEOS[argueVideoIndex]}`}
+              src={`/videos/argue/${ARGUE_VIDEOS[argueVideoIndex]}`}
               autoPlay playsInline preload="auto"
               className="vamp-media"
               onEnded={() => { arguePopup.setState('hidden'); handleArgueClose(); }}
@@ -171,4 +184,3 @@ const RulesPopups = forwardRef<RulesPopupsHandle, RulesPopupsProps>(({ playerCou
 
 RulesPopups.displayName = 'RulesPopups';
 export default RulesPopups;
-

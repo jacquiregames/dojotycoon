@@ -59,5 +59,3 @@ export const KEY_LAYERS = {
   MEDIA_POPUP: 20, // vamp / board-ninja info popups
   OVERLAY: 30, // CardRandomizer, KenoRoulette, BossDamageTracker, TeamView
 } as const;
-
-

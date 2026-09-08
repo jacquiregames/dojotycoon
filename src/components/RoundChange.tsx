@@ -1,14 +1,24 @@
 // src/components/RoundChange.tsx
 import React, { useState, useCallback, useEffect, useRef } from "react";
+import FinalBossSequence from "./FinalBossSequence";
+import type { Player } from "../types";
 import "./RoundChange.css";
  
 interface RoundChangeProps {
   currentRound: number;
   totalRounds: number;
+  players: Player[];
   onComplete: () => void;
+  // Called exactly once, at the moment the Final Boss encounter hands off
+  // to the 16.mp4 finale video (never called on non-final rounds, since
+  // there's no Final Boss encounter to hand off from). This is what
+  // GameTracker uses to know when it's actually safe to start
+  // gameover.mp3/fireworks/etc, rather than the instant the final round's
+  // trials close (which is when the boss fight *starts*, not ends).
+  onFinaleVideoStart?: () => void;
 }
 
-export default function RoundChange({ currentRound, totalRounds, onComplete }: RoundChangeProps) {
+export default function RoundChange({ currentRound, totalRounds, players, onComplete, onFinaleVideoStart }: RoundChangeProps) {
   const [displayRound, setDisplayRound] = useState(currentRound);
   const [animState, setAnimState] = useState<"idle" | "out" | "in">("idle");
   const [isGameOver, setIsGameOver] = useState(false);
@@ -20,6 +30,10 @@ export default function RoundChange({ currentRound, totalRounds, onComplete }: R
   
   const nextRound = currentRound + 1;  
   const isFinale = currentRound === totalRounds;
+
+  // On the final round, the Final Boss encounter plays out first; only once
+  // it's been closed do we move on to the 16.mp4 finale video below.
+  const [finalBossDefeated, setFinalBossDefeated] = useState(false);
   
   // Track which transition animation to use based on the starting round
   const transitionNumRef = useRef(currentRound);
@@ -49,15 +63,28 @@ export default function RoundChange({ currentRound, totalRounds, onComplete }: R
       });
     }
 
-    // MEMORY LEAK FIX: Dump video buffer on unmount
+    // Pause on unmount to stop network activity immediately. (Previously
+    // this also stripped the src via removeAttribute()+load() to more
+    // aggressively free the buffer, but that broke playback under
+    // StrictMode's dev-mode double-invoke - see the identical fix note in
+    // LandingPage.tsx for the full explanation.)
     return () => {
       if (videoElement) {
         videoElement.pause();
-        videoElement.removeAttribute('src');
-        videoElement.load();
       }
     };
   }, []);
+
+  // On the final round, the 16.mp4 <video> doesn't mount until the Final
+  // Boss encounter has been closed - give it the same forceful autoplay
+  // nudge as the mount-time effect above once it actually appears.
+  useEffect(() => {
+    if (isFinale && finalBossDefeated && videoRef.current) {
+      videoRef.current.play().catch(e => {
+        console.warn("Video autoplay prevented by browser policies:", e);
+      });
+    }
+  }, [isFinale, finalBossDefeated]);
 
   useEffect(() => {
     // Stage 1: Text Animations (If it's not the finale)
@@ -88,6 +115,15 @@ export default function RoundChange({ currentRound, totalRounds, onComplete }: R
       }, 1500);
     }
 
+    // While the Final Boss encounter is up (final round, not yet closed),
+    // there's no video to stall - it's player-paced like any other boss
+    // fight - so skip the fallback entirely until it's resolved.
+    if (isFinale && !finalBossDefeated) {
+      return () => {
+        if (t1) clearTimeout(t1);
+      };
+    }
+
     // Fallback: if the round/finale video fails to load or stalls, force
     // this overlay closed anyway rather than blocking the game forever.
     // 19s was chosen to comfortably outlast the longest round video plus
@@ -101,7 +137,7 @@ export default function RoundChange({ currentRound, totalRounds, onComplete }: R
       if (t1) clearTimeout(t1);
       clearTimeout(fallback);
     };
-  }, [currentRound, isFinale, onComplete, triggerStreaks, totalRounds]);
+  }, [currentRound, isFinale, finalBossDefeated, onComplete, triggerStreaks, totalRounds]);
 
   const getAnimClass = () => {
     if (animState === "out") {
@@ -123,20 +159,30 @@ export default function RoundChange({ currentRound, totalRounds, onComplete }: R
       {/* Coins APNG: Mid-game transition (Round 9->10 for 15-round, Round 4->5 for 10-round) */}
       {((currentRound === 10 && totalRounds === 15) || (currentRound === 5 && totalRounds === 10)) && (
         <img 
-          src="/videos/coins.png" 
+          src="/videos/rounds/coins.png" 
           alt="Coins Overlay" 
           className="coins-overlay" 
         />
       )}
       {isFinale ? (
-        <video
-          ref={videoRef}
-          src={`/videos/16.mp4`} // Force Game Over video for both 10 and 15 round games
-          autoPlay
-          playsInline
-          className="finale-video"
-          onEnded={onComplete}
-        />
+        finalBossDefeated ? (
+          <video
+            ref={videoRef}
+            src={`/videos/rounds/16.mp4`} // Force Game Over video for both 10 and 15 round games
+            autoPlay
+            playsInline
+            className="finale-video"
+            onEnded={onComplete}
+          />
+        ) : (
+          <FinalBossSequence
+            players={players}
+            onComplete={() => {
+              setFinalBossDefeated(true);
+              onFinaleVideoStart?.();
+            }}
+          />
+        )
       ) : (
         <div className={`round-change-container ${shake && !isGameOver ? "warp-shake" : ""}`}>
           
@@ -189,7 +235,7 @@ export default function RoundChange({ currentRound, totalRounds, onComplete }: R
               <div className="video-container">
                 <video
                   ref={videoRef}
-                  src={`/videos/${nextRound}.mp4`}
+                  src={`/videos/rounds/${nextRound}.mp4`}
                   autoPlay
                   playsInline
                   className="round-video"
@@ -203,5 +249,3 @@ export default function RoundChange({ currentRound, totalRounds, onComplete }: R
     </div>
   );
 }
-
-

@@ -244,11 +244,9 @@ export default function WheelSpin({ onContinue }: WheelSpinProps) {
           onClick={spinning || selected === null ? undefined : onContinue}
           style={{ opacity: spinning || selected === null ? 0 : 1, pointerEvents: spinning || selected === null ? 'none' : 'auto' }}
         >
-          <img src="/buttons/continue.png" alt="Continue" />
+          <img src="/images/buttons/continue.png" alt="Continue" />
         </button>
       </div>
     </div>
   );
 }
-
-

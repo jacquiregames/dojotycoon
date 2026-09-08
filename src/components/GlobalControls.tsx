@@ -21,10 +21,10 @@ export default function GlobalControls({
   const isDisabled = roundNumber > totalRounds || isChangingRound;
 
   let tierImageSrc = '';
-  if (playerCount === 3 && totalRounds === 10) tierImageSrc = '/tier/300600.png';
-  else if (playerCount === 3 && totalRounds === 15) tierImageSrc = '/tier/300800.png';
-  else if (playerCount === 4 && totalRounds === 10) tierImageSrc = '/tier/400800.png';
-  else if (playerCount === 4 && totalRounds === 15) tierImageSrc = '/tier/400990.png';
+  if (playerCount === 3 && totalRounds === 10) tierImageSrc = '/images/tier/300600.png';
+  else if (playerCount === 3 && totalRounds === 15) tierImageSrc = '/images/tier/300800.png';
+  else if (playerCount === 4 && totalRounds === 10) tierImageSrc = '/images/tier/400800.png';
+  else if (playerCount === 4 && totalRounds === 15) tierImageSrc = '/images/tier/400990.png';
  
   const handleTrialsClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     e.currentTarget.blur();
@@ -55,46 +55,46 @@ export default function GlobalControls({
     <div className="global-controls-container">
       <div className="trials-container">
         <button className="global-control-button" disabled={isDisabled} onClick={handleTrialsClick}>
-          <img src="/buttons/trials.png" alt="Shuffle Trials" className="main-btn-img" />
-          <img src="/banners/plus.png" alt="Shortcut Plus" className="shortcut-badge" />
+          <img src="/images/buttons/trials.png" alt="Shuffle Trials" className="main-btn-img" />
+          <img src="/images/banners/plus.png" alt="Shortcut Plus" className="shortcut-badge" />
         </button>
         {tierImageSrc && <img src={tierImageSrc} alt="Tier Range Guide" className="tier-guide-image" />}
         <span className="round-text">{roundNumber > totalRounds ? 'GAME OVER' : `Round ${roundNumber}`}</span>
       </div>
       
       <button className="global-control-button" disabled={isDisabled} onClick={handleGreenClick}>
-        <img src="/buttons/green.png" alt="Shuffle Green Prize" className="main-btn-img" />
-        <img src="/banners/divide.png" alt="Shortcut Divide" className="shortcut-badge" />
+        <img src="/images/buttons/green.png" alt="Shuffle Green Prize" className="main-btn-img" />
+        <img src="/images/banners/divide.png" alt="Shortcut Divide" className="shortcut-badge" />
       </button>
 
       <button className="global-control-button" disabled={isDisabled} onClick={handleRedClick}>
-        <img src="/buttons/red.png" alt="Shuffle Red Prize" className="main-btn-img" />
-        <img src="/banners/mult.png" alt="Shortcut Multiply" className="shortcut-badge" />
+        <img src="/images/buttons/red.png" alt="Shuffle Red Prize" className="main-btn-img" />
+        <img src="/images/banners/mult.png" alt="Shortcut Multiply" className="shortcut-badge" />
       </button>
 
       <button className="global-control-button" disabled={isDisabled} onClick={handleWagerClick}>
-        <img src="/buttons/wager.png" alt="Shuffle Wager" className="main-btn-img" />
-        <img src="/banners/minus.png" alt="Shortcut Minus" className="shortcut-badge" />
+        <img src="/images/buttons/wager.png" alt="Shuffle Wager" className="main-btn-img" />
+        <img src="/images/banners/minus.png" alt="Shortcut Minus" className="shortcut-badge" />
       </button>
             
       <button className="global-control-button" onClick={openVampPopup}>
-        <img src="/banners/one.png" className="shortcut-badge" alt="Shortcut 1" />
-        <img src="/buttons/vampire.png" alt="Vampire" />
+        <img src="/images/banners/one.png" className="shortcut-badge" alt="Shortcut 1" />
+        <img src="/images/buttons/vampire.png" alt="Vampire" />
       </button>
 
       <button className="global-control-button" onClick={openBoardNinjaPopup}>
-        <img src="/banners/three.png" className="shortcut-badge" alt="Shortcut 3" />
-        <img src="/buttons/boardninja.png" alt="Board Ninja" />
+        <img src="/images/banners/three.png" className="shortcut-badge" alt="Shortcut 3" />
+        <img src="/images/buttons/boardninja.png" alt="Board Ninja" />
       </button>
 
       <button className="global-control-button" onClick={openArguePopup}>
-        <img src="/banners/5.png" className="shortcut-badge" alt="Shortcut 5" />
-        <img src="/buttons/argue.png" alt="Argue" />
+        <img src="/images/banners/5.png" className="shortcut-badge" alt="Shortcut 5" />
+        <img src="/images/buttons/argue.png" alt="Argue" />
       </button>
 
       {roundNumber > totalRounds && (
         <button className="global-control-button" onClick={handleOuttakesClick}>
-          <img src="/buttons/outtakes.png" alt="Play Outtakes" className="main-btn-img" />
+          <img src="/images/buttons/outtakes.png" alt="Play Outtakes" className="main-btn-img" />
         </button>
       )}
     </div>
