@@ -1,19 +1,4 @@
 // src/components/FinalBossSequence.tsx
-//
-// Final Boss video machine, adapted from the standalone Final Boss app's
-// App.tsx: a looping background video per round (loop1/2/3.mp4) with a
-// one-shot transition video crossfading in ahead of it (round1/2/3.mp4),
-// then a one-shot success.mp4 or defeat.mp4 once the fight resolves.
-//
-// Unlike the standalone app - which reset back to round1 after success/
-// defeat to loop forever as a demo - this version calls onComplete() once
-// the outcome video finishes, so the caller (RoundChange) can cut to the
-// 16.mp4 finale video.
-//
-// The actual damage entry (health, 3-round grid) is handled by the same
-// BossDamageTracker used for every other boss in the game, in its 'final'
-// (red) theme - it stays mounted for the whole fight so health/grid state
-// survives every round transition, and is just faded in/out between phases.
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import BossDamageTracker from './BossDamageTracker';
@@ -41,6 +26,7 @@ export default function FinalBossSequence({ players, onComplete }: FinalBossSequ
   const topRef = useRef<HTMLVideoElement>(null);
   const bottomRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const bottomTimeoutRef = useRef<number | null>(null);
 
   const [phase, setPhase] = useState<Phase>('round1');
   const [topSrc, setTopSrc] = useState<string>(PHASE_CONFIG.round1.trans);
@@ -48,11 +34,7 @@ export default function FinalBossSequence({ players, onComplete }: FinalBossSequ
 
   const [isTopVisible, setIsTopVisible] = useState<boolean>(false);
   const [isTrackerVisible, setIsTrackerVisible] = useState<boolean>(false);
-
-  // Set initial background music volume, start it as early as possible
-  // (closest to the user gesture that triggered this encounter - closing
-  // the final trial card), and make sure it stops if the encounter is torn
-  // down (success/defeat video handing off to 16.mp4).
+ 
   useEffect(() => {
     const audio = audioRef.current;
     if (audio) {
@@ -61,12 +43,14 @@ export default function FinalBossSequence({ players, onComplete }: FinalBossSequ
     }
     return () => {
       audio?.pause();
+      if (bottomTimeoutRef.current) window.clearTimeout(bottomTimeoutRef.current);
     };
   }, []);
 
   // When the phase changes, load the next transition video and hide the
   // tracker until it's had its crossfade moment.
   useEffect(() => {
+    setIsTopVisible(false); // Reset visibility for the new phase's top video so it fades in cleanly
     setTopSrc(PHASE_CONFIG[phase].trans);
     setIsTrackerVisible(false);
   }, [phase]);
@@ -75,11 +59,16 @@ export default function FinalBossSequence({ players, onComplete }: FinalBossSequ
     setIsTopVisible(true);
 
     if (topRef.current) {
+      topRef.current.currentTime = 0; // Extra assurance that the new instance starts at 0
       topRef.current.play().catch(() => {});
     }
 
-    // Silently prep the next loop while the transition video plays.
-    setBottomSrc(PHASE_CONFIG[phase].loop);
+    // Delay swapping the bottom video's loop until the top video has fully faded in (0.8s CSS transition).
+    // This prevents the bottom loop from flashing or turning black while it's still partially visible.
+    if (bottomTimeoutRef.current) window.clearTimeout(bottomTimeoutRef.current);
+    bottomTimeoutRef.current = window.setTimeout(() => {
+      setBottomSrc(PHASE_CONFIG[phase].loop);
+    }, 850);
 
     // Attempt to start music if it was blocked by autoplay policy until now.
     if (audioRef.current && audioRef.current.paused) {
@@ -130,21 +119,19 @@ export default function FinalBossSequence({ players, onComplete }: FinalBossSequ
         muted
         playsInline
         preload="auto"
-        onError={() => {
-          // A missing/broken loop video shouldn't block the fight - if
-          // we're already meant to be showing the tracker, reveal it now.
+        onError={() => { 
           if (!isTopVisible) setIsTrackerVisible(true);
         }}
       />
 
       <video
+        key={topSrc} // 🔑 Forces React to fully remount a new video tag, permanently preventing stale frame flashes
         ref={topRef}
         className={`fbs-video fbs-top-video ${isTopVisible ? 'visible' : 'hidden'}`}
         src={topSrc}
         autoPlay
         playsInline
-        preload="auto"
-        poster="/images/backgrounds/finalboss.png"
+        preload="auto" 
         onLoadedData={handleTopLoaded}
         onEnded={handleTopEnded}
         onError={handleTopEnded}

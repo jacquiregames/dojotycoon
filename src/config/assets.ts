@@ -4,7 +4,7 @@
 // supported by this game). The encounter itself is driven by
 // FinalBossSequence.tsx, which plays the round1-3/loop1-3 and success/
 // defeat videos under /videos/finalboss/.
-export const getFinalBossHealth = (playerCount: number) => (playerCount >= 4 ? 96 : 60);
+export const getFinalBossHealth = (playerCount: number) => (playerCount >= 4 ? 80 : 60);
 
 export const ASSETS = {
   MUSIC: {

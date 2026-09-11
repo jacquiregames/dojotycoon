@@ -1,3 +1,4 @@
+// src/components/CardRandomizer.tsx
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import type { Player, GameState, DojoName, RandomizerMode, RandomizerResult, RandomizerExtraProps } from '../types';
@@ -12,14 +13,6 @@ import TrialVideoOverlay from './TrialVideoOverlay';
 import type { TrialVideoStatus } from './TrialVideoOverlay';
 import './CardRandomizer.css';
 
-// Intentionally module-level, NOT React state: each prize draw mounts a
-// brand new CardRandomizer instance, so component state would reset the
-// rotation back to video 0 every single time. These persist for the life
-// of the page so the exit videos actually rotate across draws. Leave them
-// as plain module variables - moving them into useState/useRef would
-// silently break the rotation.
-let greenPrizeVideoIndex = 0;
-let redPrizeVideoIndex = 0;
 const GREEN_VIDEOS = ['prize-green1.mp4', 'prize-green2.mp4', 'prize-green3.mp4'];
 const RED_VIDEOS = ['prize-red1.mp4', 'prize-red2.mp4', 'prize-red3.mp4'];
 
@@ -44,6 +37,9 @@ interface CardRandomizerProps {
   totalRounds: number;
   extraProps?: RandomizerExtraProps;
   drawnCards?: { wager: string[]; 'prize-green': string[]; 'prize-red': string[]; trials: number[]; };
+  prizeVideoIndices?: { green: number; red: number };
+  setPrizeVideoIndices?: React.Dispatch<React.SetStateAction<{ green: number; red: number }>>;
+  bossVideoFinished?: boolean;
 }
 
 export interface Card {
@@ -78,7 +74,7 @@ function shuffleArray<T>(array: T[]): T[] {
   return shuffled;
 }
 
-export default function CardRandomizer({ allPlayers, mode, onClose, onSubMode, isActive, gameState, totalRounds, extraProps, drawnCards }: CardRandomizerProps) {
+export default function CardRandomizer({ allPlayers, mode, onClose, onSubMode, isActive, gameState, totalRounds, extraProps, drawnCards, prizeVideoIndices, setPrizeVideoIndices, bossVideoFinished }: CardRandomizerProps) {
   const [step, setStep] = useState<AnimationStep>('init');
   const [isClosing, setIsClosing] = useState(false);
   const [trialVideoStatus, setTrialVideoStatus] = useState<TrialVideoStatus>('idle');
@@ -89,12 +85,9 @@ export default function CardRandomizer({ allPlayers, mode, onClose, onSubMode, i
   const autoTriggeredRef = useRef(false);
   const prefersReducedMotion = usePrefersReducedMotion();
 
-  // extraProps can arrive as a bare number for non-boss trial auto-triggers
-  // (see RandomizerExtraProps) - normalize once so the rest of this
-  // component can just read .roundNumber / .bossHealth / .bossId.
   const extraPropsObj = typeof extraProps === 'object' ? extraProps : undefined;
 
-  useRandomizerAudio(mode, totalRounds, extraPropsObj?.roundNumber);
+  useRandomizerAudio(mode, totalRounds, extraPropsObj?.roundNumber, bossVideoFinished);
 
   const isSingleCardReveal = ['wager', 'prize-green', 'prize-red', 'player-draw', 'trials'].includes(mode);
   const isTeamMode = useMemo(() => ['2v2', '3v1', 'tourny', '2v1'].includes(mode as string), [mode]);
@@ -131,13 +124,8 @@ export default function CardRandomizer({ allPlayers, mode, onClose, onSubMode, i
       if (extraPropsObj?.roundNumber && ROUND_TRIAL_MAP[extraPropsObj.roundNumber]) {
         const validIds = ROUND_TRIAL_MAP[extraPropsObj.roundNumber];
         const filtered = TRIAL_OPTIONS.filter(o => validIds.includes(o.id));
-        // Guard against a round map referencing ids that don't exist in
-        // TRIAL_OPTIONS (a data typo) - fall back to the full trial pool
-        // rather than silently ending up with zero cards to draw from.
         roundOptions = filtered.length > 0 ? filtered : TRIAL_OPTIONS;
       }
-      // If every trial in this round's pool has already been drawn, reuse
-      // that same round-appropriate pool rather than the entire deck.
       let available = roundOptions.filter(o => !(drawnCards?.trials || []).includes(o.id));
       if (available.length === 0) available = roundOptions; 
       
@@ -152,16 +140,6 @@ export default function CardRandomizer({ allPlayers, mode, onClose, onSubMode, i
     }));
   }, [allPlayers, mode, extraPropsObj?.roundNumber, drawnCards, totalRounds]);
 
-  // Seeded once, lazily, from whatever initialCards computed to on the
-  // very first render. Deliberately NOT re-synced on every change to
-  // initialCards: this component can remain mounted-but-inactive in the
-  // background after a trial auto-triggers a submode on top of it (see
-  // GameTracker's modeStack), and initialCards is memoized off the shared
-  // `drawnCards` object from GameTracker. If some other, unrelated draw
-  // changed `drawnCards` while this instance sat in the background, an
-  // effect keyed on initialCards would silently reset this instance's
-  // already-revealed card back to face-down. A lazy initializer sidesteps
-  // that entirely - this instance's cards are fixed for its whole lifetime.
   const [cards, setCards] = useState<Card[]>(() => initialCards);
 
   const revealedCard = useMemo(() => {
@@ -169,7 +147,6 @@ export default function CardRandomizer({ allPlayers, mode, onClose, onSubMode, i
     return cards.find(card => card.isTop);
   }, [cards, step, isSingleCardReveal]);
 
-  // Determine if this revealed trial has an example image
   const exampleImage = useMemo(() => {
     if (step !== 'result' || mode !== 'trials' || !revealedCard) return null;
     const id = Number(revealedCard.itemIdentifier);
@@ -234,9 +211,9 @@ export default function CardRandomizer({ allPlayers, mode, onClose, onSubMode, i
     isClosingRef.current = true;
     
     if (mode === 'prize-green') {
-      greenPrizeVideoIndex = (greenPrizeVideoIndex + 1) % GREEN_VIDEOS.length;
+      setPrizeVideoIndices?.(prev => ({ ...prev, green: (prev.green + 1) % GREEN_VIDEOS.length }));
     } else if (mode === 'prize-red') {
-      redPrizeVideoIndex = (redPrizeVideoIndex + 1) % RED_VIDEOS.length;
+      setPrizeVideoIndices?.(prev => ({ ...prev, red: (prev.red + 1) % RED_VIDEOS.length }));
     }
 
     setIsClosing(true);
@@ -250,7 +227,7 @@ export default function CardRandomizer({ allPlayers, mode, onClose, onSubMode, i
     } else {
       onClose();
     }
-  }, [onClose, cards, mode, isSingleCardReveal, revealedCard, isTeamMode, exitVideoPlaying]);
+  }, [onClose, cards, mode, isSingleCardReveal, revealedCard, isTeamMode, exitVideoPlaying, setPrizeVideoIndices]);
 
   useEffect(() => {
     if (step !== 'result' || !isActive) return;
@@ -261,8 +238,8 @@ export default function CardRandomizer({ allPlayers, mode, onClose, onSubMode, i
   }, [step, isActive, mode, handleContinue, isTeamMode]);
 
   const handleKeyDown = useCallback((e: KeyboardEvent): boolean => {
-    const isEnter = e.key === 'Enter' || e.code === 'NumpadEnter';
-    const isZero = e.key === '0' || e.code === 'Numpad0';
+    const isEnter = e.code === 'Enter' || e.code === 'NumpadEnter';
+    const isZero = e.code === 'Digit0' || e.code === 'Numpad0';
 
     if (trialVideoStatus === 'playing') {
       if (isEnter || isZero) { e.preventDefault(); setTrialVideoStatus('done'); }
@@ -418,7 +395,6 @@ export default function CardRandomizer({ allPlayers, mode, onClose, onSubMode, i
         </AnimatePresence>
       </motion.div>
 
-      {/* Trial Example Image Overlay - Mirrored Minimized TeamView Layout */}
       <AnimatePresence>
         {exampleImage && (
           <motion.img
@@ -449,7 +425,7 @@ export default function CardRandomizer({ allPlayers, mode, onClose, onSubMode, i
             }}
           >
             <video
-              src={mode === 'prize-green' ? `/videos/prize-green/${GREEN_VIDEOS[greenPrizeVideoIndex]}` : `/videos/prize-red/${RED_VIDEOS[redPrizeVideoIndex]}`}
+              src={mode === 'prize-green' ? `/videos/prize-green/${GREEN_VIDEOS[prizeVideoIndices?.green ?? 0]}` : `/videos/prize-red/${RED_VIDEOS[prizeVideoIndices?.red ?? 0]}`}
               autoPlay
               playsInline
               className="prize-exit-video"

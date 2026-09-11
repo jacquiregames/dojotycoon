@@ -1,8 +1,9 @@
+// src/hooks/useRandomizerAudio.ts
 import { useState, useEffect } from 'react';
 import type { RandomizerMode } from '../types';
 import { ASSETS } from '../config/assets';
 
-export function useRandomizerAudio(mode: RandomizerMode, totalRounds: number, roundNumber?: number) {
+export function useRandomizerAudio(mode: RandomizerMode, totalRounds: number, roundNumber?: number, bossVideoFinished?: boolean) {
   const [audioDelayPassed, setAudioDelayPassed] = useState(false);
 
   // 1. Play looping background music for Wager and Prize draws
@@ -52,20 +53,18 @@ export function useRandomizerAudio(mode: RandomizerMode, totalRounds: number, ro
       const bossRounds = totalRounds === 10 ? [5] : [5, 10];
       
       if (bossRounds.includes(roundNumber)) {
-        const handleBossEnded = () => setAudioDelayPassed(true);
-        window.addEventListener('bossVideoEnded', handleBossEnded);
-        
-        const fallbackTimer = setTimeout(() => setAudioDelayPassed(true), 15000); 
-
-        return () => {
-          window.removeEventListener('bossVideoEnded', handleBossEnded);
-          clearTimeout(fallbackTimer);
-        };
+        if (bossVideoFinished) {
+          setAudioDelayPassed(true);
+        } else {
+          // Fallback timer just in case BossDamageTracker doesn't mount or finish properly
+          const fallbackTimer = setTimeout(() => setAudioDelayPassed(true), 15000); 
+          return () => clearTimeout(fallbackTimer);
+        }
       } else {
         setAudioDelayPassed(true);
       }
     }
-  }, [mode, roundNumber, totalRounds]);
+  }, [mode, roundNumber, totalRounds, bossVideoFinished]);
 
   // 4. Play Trial Round Music once the delay allows it
   useEffect(() => {

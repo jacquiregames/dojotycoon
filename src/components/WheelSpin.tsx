@@ -153,7 +153,7 @@ export default function WheelSpin({ onContinue }: WheelSpinProps) {
 
   // Register keyboard shortcut to progress to the game
   const handleKeyDown = useCallback((e: KeyboardEvent): boolean => {
-    if ((e.key === 'Enter' || e.code === 'NumpadEnter') && !spinning && selected !== null) {
+    if ((e.code === 'Enter' || e.code === 'NumpadEnter') && !spinning && selected !== null) {
       e.preventDefault();
       onContinue();
       return true;

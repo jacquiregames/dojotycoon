@@ -45,7 +45,7 @@ export default function TeamView({ selected, mode, onClose, autoMinimize, onMini
   // Self-contained keyboard logic
   const handleKeyDown = useCallback((e: KeyboardEvent): boolean => {
     e.preventDefault();
-    if (e.key === '0' || e.code === 'Numpad0') {
+    if (e.code === 'Digit0' || e.code === 'Numpad0') {
       if (autoMinimize) {
         setIsMinimized(true);
         if (onMinimize) onMinimize(); // ALERT PARENT

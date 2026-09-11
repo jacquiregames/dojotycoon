@@ -1,3 +1,4 @@
+// src/components/BossDamageTracker.tsx
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'motion/react';
 import { PLAYER_COLOR_MAP } from '../types';
@@ -12,17 +13,11 @@ interface BossDamageTrackerProps {
   bossId?: number;
   onClose: () => void;
   isActive: boolean;
-  // 'final' swaps the tracker into the red-hued Final Boss theme (see
-  // BossDamageTracker.css) and lets the health label be overridden.
   variant?: 'default' | 'final';
   healthLabel?: string;
-  // When provided, a round-transition video sequence (see
-  // FinalBossSequence.tsx) is driving this tracker: round-complete and
-  // game-end are reported here instead of showing the built-in
-  // success/fail modal, so the parent can cut to its own success/defeat
-  // video at exactly the right moment.
   onRoundComplete?: (nextRound: number) => void;
   onGameEnd?: (result: 'success' | 'fail') => void;
+  onBossVideoEnded?: () => void;
 }
  
 const BOSS_ROUNDS_COUNT = 3;
@@ -31,7 +26,7 @@ const ROUNDS = Array.from({ length: BOSS_ROUNDS_COUNT }, (_, i) => i + 1);
 type Grid = (number | null)[][];
 type ModalState = 'none' | 'success' | 'fail';
 
-export default function BossDamageTracker({ players, initialHealth, bossId, onClose, isActive, variant = 'default', healthLabel = 'Health', onRoundComplete, onGameEnd }: BossDamageTrackerProps) {
+export default function BossDamageTracker({ players, initialHealth, bossId, onClose, isActive, variant = 'default', healthLabel = 'Health', onRoundComplete, onGameEnd, onBossVideoEnded }: BossDamageTrackerProps) {
   const isFinal = variant === 'final';
   const pCount = players.length; 
   const TOTAL_ENTRIES = pCount * BOSS_ROUNDS_COUNT;  
@@ -102,7 +97,6 @@ export default function BossDamageTracker({ players, initialHealth, bossId, onCl
     setEntryCount(newEntryCount);
     setInputBuffer('');
 
-    // DELAY THE MODAL: Let the players watch the health bar drop to zero first!
     if (newHealth <= 0) {
       isEvaluatingRef.current = true;
       setTimeout(() => {
@@ -124,9 +118,6 @@ export default function BossDamageTracker({ players, initialHealth, bossId, onCl
         isEvaluatingRef.current = false;
       }, 600);
     } else if (onRoundComplete && newEntryCount % pCount === 0) {
-      // A round's worth of entries just finished (and it wasn't the final
-      // one, since that's caught above) - tell the sequence controller so
-      // it can cut to the next round's transition video.
       const roundFinished = newEntryCount / pCount;
       onRoundComplete(roundFinished + 1);
     }
@@ -153,7 +144,7 @@ export default function BossDamageTracker({ players, initialHealth, bossId, onCl
     } else if (k === 'Enter' || k === 'Return' || code === 'NumpadEnter') {
       submitEntry();
     } else if (k === 'Escape' || k === 'Delete') {
-      setInputBuffer(''); // Instantly clear on Escape/Delete
+      setInputBuffer(''); 
     } else if (k === 'Backspace') {
       setInputBuffer(prev => prev.slice(0, -1));
     }
@@ -185,7 +176,7 @@ export default function BossDamageTracker({ players, initialHealth, bossId, onCl
             className="boss-intro-video"
             onEnded={() => {
               setIntroPlaying(false); 
-              window.dispatchEvent(new Event('bossVideoEnded')); 
+              if (onBossVideoEnded) onBossVideoEnded();
             }}
           />
         </div>
@@ -271,7 +262,6 @@ export default function BossDamageTracker({ players, initialHealth, bossId, onCl
                   </tr>
                 </tbody>
               </table>
-
             </div>
           </div>
         </div>

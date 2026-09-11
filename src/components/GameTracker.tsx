@@ -1,3 +1,4 @@
+// src/components/GameTracker.tsx
 import { useState, useEffect, useRef } from 'react';
 import type { FocusCell, Player, RandomizerMode, RandomizerExtraProps, RandomizerResult } from '../types';
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
@@ -30,10 +31,6 @@ interface ModeStackItem {
   extraProps?: RandomizerExtraProps;
 }
 
-// extraProps for a 'boss' mode item is normally { bossHealth, bossId }, but
-// can also arrive as a bare number or undefined (see RandomizerExtraProps).
-// Normalize it once here rather than repeating the typeof-narrowing at the
-// call site.
 function getBossProps(extraProps?: RandomizerExtraProps): { bossHealth: number; bossId?: number } {
   if (typeof extraProps === 'number') return { bossHealth: extraProps };
   return { bossHealth: extraProps?.bossHealth ?? 200, bossId: extraProps?.bossId };
@@ -47,6 +44,8 @@ export default function GameTracker({ initialPlayers, totalRounds }: GameTracker
   const [revealedTeams, setRevealedTeams] = useState<{ mode: '2v2' | '2v1' | '3v1' | 'tourny'; players: Player[]; autoMinimize?: boolean; isMinimized?: boolean } | null>(null);
   const [revealedMinigame, setRevealedMinigame] = useState<{ mode: 'keno' | 'roulette'; selectedNumbers: number[] } | null>(null);
   const [roundNumber, setRoundNumber] = useState(1);
+  const [prizeVideoIndices, setPrizeVideoIndices] = useState({ green: 0, red: 0 });
+  const [bossVideoFinished, setBossVideoFinished] = useState(false);
 
   const [drawnCards, setDrawnCards] = useState<{ wager: string[]; 'prize-green': string[]; 'prize-red': string[]; trials: number[]; }>({
     wager: [], 'prize-green': [], 'prize-red': [], trials: [],
@@ -83,7 +82,7 @@ export default function GameTracker({ initialPlayers, totalRounds }: GameTracker
 
   const openRandomizer = (mode: RandomizerMode, players: Player[] = initialPlayers, clickedIndex?: number, extraProps?: RandomizerExtraProps) => {
     if (roundNumber > totalRounds || changingRound !== null) return; 
-    setModeStack(prev => [...prev, { id: `${mode}-${Date.now()}-${Math.random()}`, mode, players, clickedIndex, extraProps }]);
+    setModeStack(prev => [...prev, { id: `${mode}-${crypto.randomUUID()}`, mode, players, clickedIndex, extraProps }]);
   };
 
   const handleRandomizerClose = (result?: RandomizerResult) => {
@@ -93,18 +92,11 @@ export default function GameTracker({ initialPlayers, totalRounds }: GameTracker
       if (roundNumber < totalRounds) {
         setRoundNumber(prev => prev + 1);
       }
-      // If this WAS the final round, roundNumber deliberately stays at
-      // totalRounds for now instead of advancing immediately - advancing
-      // it here would flip "roundNumber > totalRounds" (which triggers
-      // gameover.mp3, fireworks, etc.) on the instant the Final Boss fight
-      // begins, well before the 16.mp4 finale video actually starts.
-      // RoundChange calls onFinaleVideoStart below at the exact moment it
-      // hands off from the boss fight to 16.mp4, and that's what advances
-      // roundNumber instead.
     }
 
     const isSubModeFromTrials = modeStack.length >= 2 && modeStack[modeStack.length - 2].mode === 'trials';
     setModeStack(prev => prev.slice(0, -1));
+    setBossVideoFinished(false);
     
     if (result) {
       if (result.type === 'team') {
@@ -173,9 +165,9 @@ export default function GameTracker({ initialPlayers, totalRounds }: GameTracker
         if (item.mode === 'keno' || item.mode === 'roulette') return <KenoRoulette key={item.id} mode={item.mode} onClose={handleRandomizerClose} isActive={isActive} />;
         if (item.mode === 'boss') {
           const bossProps = getBossProps(item.extraProps);
-          return <BossDamageTracker key={item.id} players={item.players} initialHealth={bossProps.bossHealth} bossId={bossProps.bossId} onClose={handleRandomizerClose} isActive={isActive} />;
+          return <BossDamageTracker key={item.id} players={item.players} initialHealth={bossProps.bossHealth} bossId={bossProps.bossId} onClose={handleRandomizerClose} isActive={isActive} onBossVideoEnded={() => setBossVideoFinished(true)} />;
         }
-        return <CardRandomizer key={item.id} allPlayers={item.players} mode={item.mode} onClose={handleRandomizerClose} onSubMode={(mode, extraProps) => openRandomizer(mode, item.players, undefined, extraProps)} isActive={isActive} gameState={state} extraProps={item.extraProps} drawnCards={drawnCards} totalRounds={totalRounds} />;
+        return <CardRandomizer key={item.id} allPlayers={item.players} mode={item.mode} onClose={handleRandomizerClose} onSubMode={(mode, extraProps) => openRandomizer(mode, item.players, undefined, extraProps)} isActive={isActive} gameState={state} extraProps={item.extraProps} drawnCards={drawnCards} totalRounds={totalRounds} prizeVideoIndices={prizeVideoIndices} setPrizeVideoIndices={setPrizeVideoIndices} bossVideoFinished={bossVideoFinished} />;
       })}
 
       {revealedTeams && <TeamView mode={revealedTeams.mode} selected={revealedTeams.players} onClose={() => setRevealedTeams(null)} autoMinimize={revealedTeams.autoMinimize} onMinimize={() => setRevealedTeams(prev => prev ? { ...prev, isMinimized: true } : null)} />}

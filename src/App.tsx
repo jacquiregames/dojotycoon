@@ -1,3 +1,4 @@
+// src/App.tsx
 import { useState } from 'react';
 import LandingPage from './components/LandingPage';
 import GameTracker from './components/GameTracker';

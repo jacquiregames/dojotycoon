@@ -1,6 +1,8 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+// src/components/KenoRoulette.tsx
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "motion/react";
 import { useKeyRouterLayer, KEY_LAYERS } from "../hooks/useKeyRouterLayer";
+import { useSafeTimeout } from "../hooks/useSafeTimeout";
 import type { RandomizerResult } from "../types";
 import "./KenoRoulette.css";
 
@@ -8,7 +10,6 @@ const TOTAL_CELLS = 12;
 const COLUMNS = 4;
 const NUMBERS_TO_PICK = 5;
 
-// Move the array generation outside the component so it doesn't trigger re-renders
 const NUMBERS = Array.from({ length: TOTAL_CELLS }, (_, i) => i + 1);
 
 interface KenoRouletteProps {
@@ -32,33 +33,24 @@ export default function KenoRoulette({ mode, onClose, isActive, initialNumbers, 
   const [selectedNumbers, setSelectedNumbers] = useState<Set<number>>(
     initialNumbers ? new Set(initialNumbers) : new Set()
   );
-  const[isPlaying, setIsPlaying] = useState(!initialNumbers);
+  const [isPlaying, setIsPlaying] = useState(!initialNumbers);
   const [isClosing, setIsClosing] = useState(false);
-  const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
-
-  const clearAllTimeouts = () => {
-    timeoutsRef.current.forEach((t) => clearTimeout(t));
-    timeoutsRef.current =[];
-  };
+  const setSafeTimeout = useSafeTimeout();
 
   const playKeno = useCallback(() => {
     const shuffled = shuffleArray(NUMBERS);
     const picked = shuffled.slice(0, NUMBERS_TO_PICK);
 
     picked.forEach((number, index) => {
-      const tid = setTimeout(() => {
+      setSafeTimeout(() => {
         setSelectedNumbers((prev) => new Set([...prev, number]));
 
         if (index === NUMBERS_TO_PICK - 1) {
-          const finishTid = setTimeout(() => {
-            setIsPlaying(false);
-          }, 500);
-          timeoutsRef.current.push(finishTid);
+          setSafeTimeout(() => setIsPlaying(false), 500);
         }
       }, (index + 1) * 800);
-      timeoutsRef.current.push(tid);
     });
-  },[]); 
+  }, [setSafeTimeout]); 
 
   const playRoulette = useCallback(() => {
     const finalNumber = Math.floor(Math.random() * TOTAL_CELLS) + 1;
@@ -71,7 +63,7 @@ export default function KenoRoulette({ mode, onClose, isActive, initialNumbers, 
         ? i * spinDelay
         : slowDownStart * spinDelay + (i - slowDownStart) * spinDelay * 3;
 
-      const tid = setTimeout(() => {
+      setSafeTimeout(() => {
         if (i < spinCount - 1) {
           // Flash a random number while spinning
           const randomNum = Math.floor(Math.random() * TOTAL_CELLS) + 1;
@@ -79,18 +71,16 @@ export default function KenoRoulette({ mode, onClose, isActive, initialNumbers, 
         } else {
           // Land on final number
           setSelectedNumbers(new Set([finalNumber]));
-          const finishTid = setTimeout(() => setIsPlaying(false), 500);
-          timeoutsRef.current.push(finishTid);
+          setSafeTimeout(() => setIsPlaying(false), 500);
         }
       }, delay);
-      timeoutsRef.current.push(tid);
     }
-  },[]);
+  }, [setSafeTimeout]);
 
   // Handle animation play sequence
   useEffect(() => {
     if (initialNumbers) return; // Skip animation if we're rendering from a minimized state
-    clearAllTimeouts();
+    
     setSelectedNumbers(new Set());
     setIsPlaying(true);
 
@@ -99,9 +89,7 @@ export default function KenoRoulette({ mode, onClose, isActive, initialNumbers, 
     } else {
       playRoulette();
     }
-
-    return clearAllTimeouts;
-  },[mode, playKeno, playRoulette, initialNumbers]);
+  }, [mode, playKeno, playRoulette, initialNumbers]);
 
   // Handle auto-minimize timer once animation completes
   useEffect(() => {
@@ -110,31 +98,26 @@ export default function KenoRoulette({ mode, onClose, isActive, initialNumbers, 
         if (!isClosing) {
           onClose({ type: 'minigame', mode, selectedNumbers: Array.from(selectedNumbers) });
         }
-      }, 3000); // 4 seconds before auto shrinking to the corner
+      }, 3000); // 3 seconds before auto shrinking to the corner
       return () => clearTimeout(tid);
     }
-  },[isPlaying, isMinimized, initialNumbers, isClosing, mode, selectedNumbers, onClose]);
+  }, [isPlaying, isMinimized, initialNumbers, isClosing, mode, selectedNumbers, onClose]);
  
   const handleContinue = useCallback(() => {
     if (isPlaying) return;
     setIsClosing(true);
-    setTimeout(() => {
+    setSafeTimeout(() => {
       if (isMinimized) {
         onClose(); // Cleanly unmount if already in the corner
       } else {
         onClose({ type: 'minigame', mode, selectedNumbers: Array.from(selectedNumbers) });
       }
     }, 300);
-  }, [isPlaying, onClose, mode, selectedNumbers, isMinimized]);
+  }, [isPlaying, onClose, mode, selectedNumbers, isMinimized, setSafeTimeout]);
 
-  // Self-contained keyboard logic, routed through the central priority
-  // stack. "Never block underlying shortcuts if minimized" is now expressed
-  // as simply not registering this layer at all while minimized - the
-  // router then naturally falls through to whatever's below (usually the
-  // investment grid).
   const handleKeyDown = useCallback((e: KeyboardEvent): boolean => {
-    const isEnter = e.key === 'Enter' || e.code === 'NumpadEnter';
-    const isZero = e.key === '0' || e.code === 'Numpad0';
+    const isEnter = e.code === 'Enter' || e.code === 'NumpadEnter';
+    const isZero = e.code === 'Digit0' || e.code === 'Numpad0';
 
     if ((isZero || isEnter) && !isPlaying) {
       e.preventDefault();
@@ -142,7 +125,7 @@ export default function KenoRoulette({ mode, onClose, isActive, initialNumbers, 
     } else {
       e.preventDefault();
     }
-    return true; // trap all keys while active and not minimized
+    return true;
   }, [isPlaying, handleContinue]);
 
   const handleKeyUp = useCallback((e: KeyboardEvent): boolean => {
@@ -169,12 +152,9 @@ export default function KenoRoulette({ mode, onClose, isActive, initialNumbers, 
         transition={{ duration: 0.3 }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
         <div className="keno-header">
           <h1 className="keno-title">{mode.toUpperCase()}</h1>
         </div>
-
-        {/* Grid */}
         <div
           className="number-grid"
           style={{ gridTemplateColumns: `repeat(${COLUMNS}, minmax(0, 1fr))` }}
