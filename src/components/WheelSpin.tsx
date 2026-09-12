@@ -6,24 +6,21 @@ import "./WheelSpin.css";
 type Wedge = {
   id: number;
   name: string;
-  label: string;
-  desc: string;
   color: string;
   neon: string;
-  icon: string;
   centerAngle: number;
 };
 
 const STEP = 360 / 7;
 
 const WEDGES: Wedge[] = [
-  { id: 0, name: "Shuriken", label: "Shuriken", desc: "Master thrown weapons — precision strikes from the shadows.", color: "#ff5a00", neon: "#ff9d00", icon: "✴️", centerAngle: 334.286 },
-  { id: 1, name: "Combat", label: "Combat", desc: "Kendo and close-quarters — overwhelm foes with aggressive offense.", color: "#ff0000", neon: "#ff073a", icon: "⚔️", centerAngle: 25.714 },
-  { id: 2, name: "Disguise", label: "Disguise", desc: "Infiltrate in plain sight — the yellow suit is just business.", color: "#ffff00", neon: "#ffe14d", icon: "🕵️", centerAngle: 77.143 },
-  { id: 3, name: "Climbing", label: "Climbing", desc: "Scale walls and cliffs — mobility opens forbidden paths.", color: "#00ff00", neon: "#39ff14", icon: "🧗", centerAngle: 128.571 },
-  { id: 4, name: "Stealth", label: "Stealth", desc: "Move unseen in bamboo — ghost steps and silent takedowns.", color: "#2323ff", neon: "#1f51ff", icon: "🌿", centerAngle: 180.0 },
-  { id: 5, name: "Arcane", label: "Arcane", desc: "Channel chakra vortex — mystic energy for reality-bending jutsu.", color: "#9500ff", neon: "#7f007f", icon: "🔮", centerAngle: 231.429 },
-  { id: 6, name: "Ninja Stuff", label: "Ninja Stuff", desc: "Gadgets, rides and drip — SHINOBI-licensed gear.", color: "#22d3ee", neon: "#67e8f9", icon: "🚗", centerAngle: 282.857 },
+  { id: 0, name: "Shuriken", color: "#ff5a00", neon: "#ff9d00", centerAngle: 334.286 },
+  { id: 1, name: "Combat", color: "#ff0000", neon: "#ff073a", centerAngle: 25.714 },
+  { id: 2, name: "Disguise", color: "#ffff00", neon: "#ffe14d", centerAngle: 77.143 },
+  { id: 3, name: "Climbing", color: "#00ff00", neon: "#39ff14", centerAngle: 128.571 },
+  { id: 4, name: "Stealth", color: "#2323ff", neon: "#1f51ff", centerAngle: 180.0 },
+  { id: 5, name: "Arcane", color: "#9500ff", neon: "#7f007f", centerAngle: 231.429 },
+  { id: 6, name: "Ninja Stuff", color: "#22d3ee", neon: "#67e8f9", centerAngle: 282.857 },
 ];
  
 function squareEdgePoint(angleDeg: number) {
