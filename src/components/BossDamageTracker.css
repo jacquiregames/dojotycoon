@@ -1,3 +1,4 @@
+/* src/components/BossDamageTracker.css */
 .boss-damage-tracker-overlay {
   --bg: #050712;
   --panel: rgba(10, 17, 38, 0.88);
@@ -70,6 +71,10 @@
   background-color: #000;
 }
 
+.boss-intro-overlay.evenodd {
+  background-image: url('/images/backgrounds/evenoddboss.png');
+}
+
 .boss-intro-video-container {
   position: absolute;
   bottom: 0;
@@ -119,7 +124,7 @@
   position: relative;
   z-index: 1;
   width: 100%;
-  max-width: 800px; /* Reduced since the side panel is gone */
+  max-width: 700px; /* Reduced since the side panel is gone */
   padding: clamp(8px, 2vw, 20px);
   outline: none;
   animation: stageIn 520ms ease-out both;
@@ -172,6 +177,10 @@
   position: relative;
   z-index: 1;
 }
+
+/* =========================================
+   STANDARD HEALTH HEADER
+   ========================================= */
 
 .health-container {
   min-height: 120px;
@@ -264,6 +273,107 @@
   box-shadow: 0 0 20px rgba(255, 62, 139, 0.55);
 }
 
+/* =========================================
+   EVEN / ODD DUAL HEALTH HEADER
+   ========================================= */
+
+.health-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 22px 30px;
+  border-color: rgba(89, 241, 255, 0.34);
+  box-shadow:
+    0 24px 70px rgba(0, 0, 0, 0.52),
+    0 0 46px rgba(89, 241, 255, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.health-bars {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: 100%;
+  gap: clamp(18px, 4vw, 58px);
+  margin-top: 5px;
+}
+
+.health-track {
+  min-width: 0;
+  text-align: left;
+}
+
+.health-bar-label {
+  display: flex;
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 8px;
+}
+
+.health-bar-label strong {
+  color: var(--pink);
+  letter-spacing: 0.15em;
+}
+
+.health-track-even .health-bar-label strong {
+  color: var(--cyan);
+}
+
+.health-track .health-value {
+  margin: 0;
+  color: var(--pink);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 950;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  text-shadow: 0 0 12px rgba(255, 62, 139, 0.65), 0 0 36px rgba(255, 62, 139, 0.28);
+}
+
+.health-track-even .health-value {
+  color: var(--cyan);
+  text-shadow: 0 0 12px rgba(89, 241, 255, 0.65), 0 0 36px rgba(89, 241, 255, 0.28);
+}
+
+.health-track .health-meter {
+  width: 100%;
+  height: 11px;
+  margin-top: 15px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(2, 7, 18, 0.72);
+  box-shadow: inset 0 0 16px rgba(0, 0, 0, 0.66);
+}
+
+.health-track .health-meter-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #ff3e8b, #ff6a3d);
+  box-shadow: 0 0 18px rgba(255, 62, 139, 0.45);
+  transition: width 380ms ease;
+}
+
+.health-track-even .health-meter-fill {
+  background: linear-gradient(90deg, var(--green), var(--cyan));
+  box-shadow: 0 0 18px rgba(89, 241, 255, 0.45);
+}
+
+.health-track.is-critical .health-meter-fill {
+  box-shadow: 0 0 20px rgba(255, 62, 139, 0.7);
+}
+
+.health-track-even.is-critical .health-meter-fill {
+  box-shadow: 0 0 20px rgba(89, 241, 255, 0.7);
+}
+
+
+/* =========================================
+   DAMAGE GRID & UI 
+   ========================================= */
 .container-table {
   min-width: 0;
   padding: 24px;

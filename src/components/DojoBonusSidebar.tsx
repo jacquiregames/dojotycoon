@@ -3,7 +3,8 @@ import React, { useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { DOJO_COLOR_MAP, PLAYER_COLOR_MAP } from '../types';
 import type { GameState, DojoName } from '../types';
-import { trialDiceData, TIER_THRESHOLDS } from '../config/cardDecks';
+import { trialDiceData } from '../config/trials';
+import { TIER_THRESHOLDS } from '../config/investments';
 import type { Card } from './CardRandomizer';
 
 interface DiceMediaProps {
@@ -14,16 +15,10 @@ interface DiceMediaProps {
 function DiceMedia({ dice, className }: DiceMediaProps) {
   const [hasError, setHasError] = useState(false);
 
-  // Fallback to purely using the image if the MP4 fails to load (404)
   if (hasError) {
     return <img src={`/videos/dice/${dice}.png`} alt={dice} className={className} />;
   }
 
-  // Attempt to play the video. There's no poster fallback image anymore
-  // (the per-dice poster PNGs were intentionally removed since the videos
-  // load reliably) - `dq` is the one exception: it has no video at all, so
-  // it deliberately 404s here and falls through to the PNG branch above,
-  // which is its actual (animated) artwork.
   return (
     <video
       src={`/videos/dice/${dice}.mp4`}
@@ -46,6 +41,7 @@ interface DojoBonusSidebarProps {
 
 export default function DojoBonusSidebar({ step, mode, revealedCard, gameState }: DojoBonusSidebarProps) {
   const revealedDojo = revealedCard?.content.dojo as DojoName | undefined;
+  const bonusText = revealedCard?.content.bonusText; // <-- GRAB TEXT
   
   const eligiblePlayers = useMemo(() => {
     if (!gameState || !revealedDojo) return [];
@@ -81,6 +77,12 @@ export default function DojoBonusSidebar({ step, mode, revealedCard, gameState }
         <h2 className="bonus-dojo-name" style={{ '--dojo-color': DOJO_COLOR_MAP[revealedDojo] } as React.CSSProperties}>
           {revealedDojo} Bonus
         </h2>
+
+        {/* INSERTED HERE */}
+        {bonusText && (
+          <p className="bonus-description">{bonusText}</p>
+        )}
+
         {eligiblePlayers.length > 0 ? (
           <ul className="bonus-player-list">
             {eligiblePlayers.map(p => (

@@ -29,8 +29,13 @@ export default function FinalBossSequence({ players, onComplete }: FinalBossSequ
   const bottomTimeoutRef = useRef<number | null>(null);
 
   const [phase, setPhase] = useState<Phase>('round1');
-  const [topSrc, setTopSrc] = useState<string>(PHASE_CONFIG.round1.trans);
-  const [bottomSrc, setBottomSrc] = useState<string>(PHASE_CONFIG.round1.loop);
+  
+  // 🔑 Synchronously derived so it maps instantly when phase changes
+  const topSrc = PHASE_CONFIG[phase].trans;
+  
+  // 🔑 Fix: Start empty! If this is loop1.mp4, you will see it bleeding 
+  // through the opacity fade-in of round1.mp4, creating the "stale flash" illusion.
+  const [bottomSrc, setBottomSrc] = useState<string>('');
 
   const [isTopVisible, setIsTopVisible] = useState<boolean>(false);
   const [isTrackerVisible, setIsTrackerVisible] = useState<boolean>(false);
@@ -47,47 +52,43 @@ export default function FinalBossSequence({ players, onComplete }: FinalBossSequ
     };
   }, []);
 
-  // When the phase changes, load the next transition video and hide the
-  // tracker until it's had its crossfade moment.
   useEffect(() => {
-    setIsTopVisible(false); // Reset visibility for the new phase's top video so it fades in cleanly
-    setTopSrc(PHASE_CONFIG[phase].trans);
+    setIsTopVisible(false); // Ensures every new phase top-video starts hidden for a clean fade-in
     setIsTrackerVisible(false);
   }, [phase]);
 
   const handleTopLoaded = () => {
-    setIsTopVisible(true);
-
     if (topRef.current) {
-      topRef.current.currentTime = 0; // Extra assurance that the new instance starts at 0
+      topRef.current.currentTime = 0; 
       topRef.current.play().catch(() => {});
     }
+  };
 
-    // Delay swapping the bottom video's loop until the top video has fully faded in (0.8s CSS transition).
-    // This prevents the bottom loop from flashing or turning black while it's still partially visible.
-    if (bottomTimeoutRef.current) window.clearTimeout(bottomTimeoutRef.current);
-    bottomTimeoutRef.current = window.setTimeout(() => {
-      setBottomSrc(PHASE_CONFIG[phase].loop);
-    }, 850);
+  const handleTimeUpdate = () => {
+    // Reveal top video only once it is actively ticking forward
+    if (!isTopVisible && topRef.current && topRef.current.currentTime > 0.05) {
+      setIsTopVisible(true);
 
-    // Attempt to start music if it was blocked by autoplay policy until now.
-    if (audioRef.current && audioRef.current.paused) {
-      audioRef.current.play().catch(() => {});
+      // Delay slotting the bottom video's loop until the top video has fully faded in (0.8s)
+      if (bottomTimeoutRef.current) window.clearTimeout(bottomTimeoutRef.current);
+      bottomTimeoutRef.current = window.setTimeout(() => {
+        setBottomSrc(PHASE_CONFIG[phase].loop);
+      }, 850);
+
+      if (audioRef.current && audioRef.current.paused) {
+        audioRef.current.play().catch(() => {});
+      }
     }
   };
 
   const handleTopEnded = useCallback(() => {
     if (PHASE_CONFIG[phase].isFinal) {
-      // success.mp4 / defeat.mp4 just finished - hand off to the 16.mp4
-      // finale video.
       onComplete();
-    } else if (bottomRef.current) {
+    } else if (bottomRef.current && bottomSrc) {
       bottomRef.current.play().then(() => {
         setIsTopVisible(false);
         setIsTrackerVisible(true);
       }).catch(() => {
-        // Even if the loop video can't play, don't strand the fight on a
-        // black screen - reveal the tracker anyway.
         setIsTopVisible(false);
         setIsTrackerVisible(true);
       });
@@ -95,10 +96,9 @@ export default function FinalBossSequence({ players, onComplete }: FinalBossSequ
       setIsTopVisible(false);
       setIsTrackerVisible(true);
     }
-  }, [phase, onComplete]);
+  }, [phase, onComplete, bottomSrc]);
 
-  // Safety net: if a transition video is missing or stalls, don't leave the
-  // fight stuck on a black screen forever - proceed as if it had ended.
+  // Safety net
   useEffect(() => {
     if (isTopVisible) return;
     const fallback = setTimeout(() => {
@@ -114,18 +114,19 @@ export default function FinalBossSequence({ players, onComplete }: FinalBossSequ
       <video
         ref={bottomRef}
         className="fbs-video fbs-bottom-video"
-        src={bottomSrc}
+        src={bottomSrc ? bottomSrc : undefined}
         loop
         muted
         playsInline
         preload="auto"
         onError={() => { 
+          if (!bottomSrc) return; // Ignore missing src errors from the empty initialization
           if (!isTopVisible) setIsTrackerVisible(true);
         }}
       />
 
       <video
-        key={topSrc} // 🔑 Forces React to fully remount a new video tag, permanently preventing stale frame flashes
+        key={topSrc}
         ref={topRef}
         className={`fbs-video fbs-top-video ${isTopVisible ? 'visible' : 'hidden'}`}
         src={topSrc}
@@ -133,6 +134,7 @@ export default function FinalBossSequence({ players, onComplete }: FinalBossSequ
         playsInline
         preload="auto" 
         onLoadedData={handleTopLoaded}
+        onTimeUpdate={handleTimeUpdate}
         onEnded={handleTopEnded}
         onError={handleTopEnded}
       />
@@ -144,6 +146,7 @@ export default function FinalBossSequence({ players, onComplete }: FinalBossSequ
       <div className={`fbs-tracker-wrap ${isTrackerVisible ? 'visible' : ''}`}>
         <BossDamageTracker
           players={players}
+          bossType="boss"
           initialHealth={getFinalBossHealth(players.length)}
           variant="final"
           healthLabel="Final Boss Health"

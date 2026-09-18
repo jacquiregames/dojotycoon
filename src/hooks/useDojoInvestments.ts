@@ -1,6 +1,6 @@
 // src/hooks/useDojoInvestments.ts
 import { useState, useCallback } from 'react';
-import { getMaxInvestment, TIER_THRESHOLDS } from '../config/cardDecks';
+import { getMaxInvestment, TIER_THRESHOLDS } from '../config/investments';
 import { DOJO_NAMES } from '../types';
 import type { DojoName, GameState, FocusCell, Player } from '../types';
 

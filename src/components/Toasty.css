@@ -1,0 +1,18 @@
+.toasty-image {
+  position: fixed;
+  bottom: 0;
+  width: auto; 
+  height: 70vh;
+  z-index: 9999; /* Extemely high to guarantee it overlays all cinematics/modals */
+  pointer-events: none; /* Make sure it doesn't block any clicks */
+  object-fit: contain;
+  filter: drop-shadow(0 0 20px rgba(0, 0, 0, 0.8));
+}
+
+.toasty-left {
+  left: -20vw;
+}
+
+.toasty-right {
+  right: -20vw;
+}

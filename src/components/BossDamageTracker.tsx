@@ -9,8 +9,9 @@ import './BossDamageTracker.css';
 
 interface BossDamageTrackerProps {
   players: Player[];
+  bossType?: 'boss' | 'evenoddboss';
   initialHealth: number;
-  bossId?: number;
+  bossId?: string | number;
   onClose: () => void;
   isActive: boolean;
   variant?: 'default' | 'final';
@@ -26,10 +27,12 @@ const ROUNDS = Array.from({ length: BOSS_ROUNDS_COUNT }, (_, i) => i + 1);
 type Grid = (number | null)[][];
 type ModalState = 'none' | 'success' | 'fail';
 
-export default function BossDamageTracker({ players, initialHealth, bossId, onClose, isActive, variant = 'default', healthLabel = 'Health', onRoundComplete, onGameEnd, onBossVideoEnded }: BossDamageTrackerProps) {
+export default function BossDamageTracker({ players, bossType = 'boss', initialHealth, bossId, onClose, isActive, variant = 'default', healthLabel = 'Health', onRoundComplete, onGameEnd, onBossVideoEnded }: BossDamageTrackerProps) {
   const isFinal = variant === 'final';
+  const isEvenOdd = bossType === 'evenoddboss';
   const pCount = players.length; 
   const TOTAL_ENTRIES = pCount * BOSS_ROUNDS_COUNT;  
+  
   const [grid, setGrid] = useState<Grid>(() => 
     Array.from({ length: pCount }, () => Array(BOSS_ROUNDS_COUNT).fill(null))
   );
@@ -42,8 +45,15 @@ export default function BossDamageTracker({ players, initialHealth, bossId, onCl
 
   const [introPlaying, setIntroPlaying] = useState(!!bossId);
   const videoRef = useRef<HTMLVideoElement>(null);
+  
   const [health, setHealth] = useState(initialHealth);
+  const [evenHealth, setEvenHealth] = useState(initialHealth);
+  const [oddHealth, setOddHealth] = useState(initialHealth);
+  
   const animatedHealth = useCountUp(health, 400);
+  const animatedEvenHealth = useCountUp(evenHealth, 400);
+  const animatedOddHealth = useCountUp(oddHealth, 400);
+
   const [entryCount, setEntryCount] = useState(0);   
   const [inputBuffer, setInputBuffer] = useState(''); 
   const [modal, setModal] = useState<ModalState>('none');
@@ -89,15 +99,38 @@ export default function BossDamageTracker({ players, initialHealth, bossId, onCl
     const newGrid = grid.map(r => [...r]) as Grid;
     newGrid[row][col] = value;
 
-    const newHealth = health - value;
+    let newHealth = health;
+    let newEvenHealth = evenHealth;
+    let newOddHealth = oddHealth;
+
+    if (isEvenOdd) {
+      const isEvenDamage = value % 2 === 0;
+      if (isEvenDamage) {
+        newEvenHealth -= value;
+      } else {
+        newOddHealth -= value;
+      }
+    } else {
+      newHealth -= value;
+    }
+
     const newEntryCount = entryCount + 1;
 
     setGrid(newGrid);
     setHealth(newHealth);
+    setEvenHealth(newEvenHealth);
+    setOddHealth(newOddHealth);
     setEntryCount(newEntryCount);
     setInputBuffer('');
 
-    if (newHealth <= 0) {
+    let isWin = false;
+    if (isEvenOdd) {
+      isWin = newEvenHealth <= 0 && newOddHealth <= 0;
+    } else {
+      isWin = newHealth <= 0;
+    }
+
+    if (isWin) {
       isEvaluatingRef.current = true;
       setTimeout(() => {
         if (onGameEnd) {
@@ -121,7 +154,7 @@ export default function BossDamageTracker({ players, initialHealth, bossId, onCl
       const roundFinished = newEntryCount / pCount;
       onRoundComplete(roundFinished + 1);
     }
-  }, [introPlaying, modal, inputBuffer, entryCount, health, grid, onClose, TOTAL_ENTRIES, entryToCell, onRoundComplete, onGameEnd]);
+  }, [introPlaying, modal, inputBuffer, entryCount, health, evenHealth, oddHealth, grid, onClose, TOTAL_ENTRIES, entryToCell, onRoundComplete, onGameEnd, isEvenOdd]);
  
   const handleKeyDown = useCallback((e: KeyboardEvent): boolean => {
     e.preventDefault();
@@ -185,8 +218,15 @@ export default function BossDamageTracker({ players, initialHealth, bossId, onCl
   }
 
   const [activeRow, activeCol] = entryCount < TOTAL_ENTRIES ? entryToCell(entryCount) : [-1, -1];
+  
   const healthPercent = Math.max(0, Math.min(100, (health / initialHealth) * 100));
   const healthTone = healthPercent <= 25 ? 'critical' : healthPercent <= 50 ? 'warning' : 'stable';
+
+  const evenHealthPercent = Math.max(0, Math.min(100, (evenHealth / initialHealth) * 100));
+  const evenHealthTone = evenHealthPercent <= 25 ? 'critical' : evenHealthPercent <= 50 ? 'warning' : 'stable';
+  
+  const oddHealthPercent = Math.max(0, Math.min(100, (oddHealth / initialHealth) * 100));
+  const oddHealthTone = oddHealthPercent <= 25 ? 'critical' : oddHealthPercent <= 50 ? 'warning' : 'stable';
 
   const PLAYERS = Array.from({ length: pCount }, (_, i) => players[i]?.name || `Player ${i + 1}`);
   
@@ -206,12 +246,38 @@ export default function BossDamageTracker({ players, initialHealth, bossId, onCl
       <div className="boss-wrapper" ref={appRef} tabIndex={-1} style={{ outline: 'none' }} onClick={e => e.stopPropagation()}>
         <div className="main-row">
           <div className="left-column">
-            <header className={`boss-container health-container health-${healthTone}`}> 
-              <h1>{healthLabel}: {animatedHealth}</h1>
-              <div className="health-meter" aria-hidden="true">
-                <div className="health-meter-fill" style={{ width: `${healthPercent}%` }} />
-              </div>
-            </header>
+
+            {isEvenOdd ? (
+              <header className="boss-container health-panel">
+                <div className="health-bars">
+                  <div className={`health-track health-track-even${evenHealthTone === 'critical' ? ' is-critical' : ''}`}>
+                    <div className="health-bar-label">
+                      <span><strong>Even Boss</strong></span>
+                    </div>
+                    <h1 className="health-value">Health: {animatedEvenHealth}</h1>
+                    <div className="health-meter">
+                      <div className="health-meter-fill" style={{ width: `${evenHealthPercent}%` }} />
+                    </div>
+                  </div>
+                  <div className={`health-track health-track-odd${oddHealthTone === 'critical' ? ' is-critical' : ''}`}>
+                    <div className="health-bar-label">
+                      <span><strong>Odd Boss</strong></span>
+                    </div>
+                    <h1 className="health-value">Health: {animatedOddHealth}</h1>
+                    <div className="health-meter">
+                      <div className="health-meter-fill" style={{ width: `${oddHealthPercent}%` }} />
+                    </div>
+                  </div>
+                </div>
+              </header>
+            ) : (
+              <header className={`boss-container health-container health-${healthTone}`}> 
+                <h1>{healthLabel}: {animatedHealth}</h1>
+                <div className="health-meter" aria-hidden="true">
+                  <div className="health-meter-fill" style={{ width: `${healthPercent}%` }} />
+                </div>
+              </header>
+            )}
 
             <div className="boss-container container-table">
               <table className="damage-table">

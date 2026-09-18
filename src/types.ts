@@ -1,6 +1,7 @@
+// src/types.ts
 export type DojoName = 'Combat' | 'Shuriken' | 'Stealth' | 'Disguise' | 'Climbing' | 'Arcane' | 'Ninja Stuff';
 
-export const DOJO_NAMES: DojoName[] =[
+export const DOJO_NAMES: DojoName[] = [
   'Combat',
   'Shuriken',
   'Stealth',
@@ -30,24 +31,18 @@ export interface FocusCell {
   playerIndex?: number; 
 }
 
-export type RandomizerMode = 'wager' | '2v2' | '2v1' | '3v1' | 'prize-green' | 'prize-red' | 'tourny' | 'player-draw' | 'trials' | 'keno' | 'roulette' | 'boss' | 'jackpot';
+export type RandomizerMode = 'wager' | '2v2' | '2v1' | '3v1' | 'prize-green' | 'prize-red' | 'tourny' | 'player-draw' | 'trials' | 'keno' | 'roulette' | 'boss' | 'evenoddboss' | 'jackpot';
 
-// The "extra data" a randomizer step can be opened with. In practice this is
-// either the round number a trial-draw should filter by, the boss config a
-// trial handed off to BossDamageTracker, or (for non-boss sub-modes
-// auto-triggered from a trial card) a bare number that downstream code
-// ignores. See CardRandomizer's post-trial auto-trigger effect.
 export type RandomizerExtraProps =
-  | { roundNumber?: number; bossHealth?: number; bossId?: number }
+  | { roundNumber?: number; bossHealth?: number; bossId?: string | number }
   | number;
 
-// The result a randomizer overlay reports back through onClose() once the
-// player has seen the outcome. `undefined` means "closed without a result"
-// (e.g. a plain team reveal being dismissed).
 export type RandomizerResult =
   | { type: 'team'; mode: '2v2' | '2v1' | '3v1' | 'tourny'; players: Player[] }
   | { type: 'minigame'; mode: 'keno' | 'roulette'; selectedNumbers: number[] }
   | { type: 'single'; mode: RandomizerMode; identifier?: string | number };
+
+export type DiceImage = 'd4' | 'd6' | 'd8' | 'd10' | 'd12' | 'd20' | '2d6' | '3d6' | '5d6' | 'd412' | 'd620' | 'd820' | 'dq' | 'dall';
 
 export const PLAYER_COLOR_MAP: Record<string, string> = {
   red: '#ff0000',

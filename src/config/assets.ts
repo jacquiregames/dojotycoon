@@ -1,9 +1,5 @@
 // src/config/assets.ts
-
-// Final Boss total health, scaled by player count (only 3 or 4 players are
-// supported by this game). The encounter itself is driven by
-// FinalBossSequence.tsx, which plays the round1-3/loop1-3 and success/
-// defeat videos under /videos/finalboss/.
+ 
 export const getFinalBossHealth = (playerCount: number) => (playerCount >= 4 ? 80 : 60);
 
 export const ASSETS = {
@@ -15,6 +11,7 @@ export const ASSETS = {
     INTRO: '/music/intro.mp3',
     BOSS_INTRO: '/music/bossintro.mp3',
     FINAL_BOSS: '/music/finalboss.mp3',
+    TOASTY: '/music/toasty.mp3',  
   },
   VIDEOS: {
     FINALE_16: '/videos/rounds/16.mp4',
@@ -40,6 +37,6 @@ export const ASSETS = {
   getRoundVideo: (round: number) => `/videos/rounds/${round}.mp4`,
   getTrialMusic: (round: number) => `/music/rounds/${round}.mp3`,
   getRandomizerMusic: (mode: string) => `/music/${mode}.mp3`,
-  getBossVideo: (id: number) => `/videos/bosses/${id}.mp4`,
+  getBossVideo: (id: string | number) => `/videos/bosses/${id}.mp4`,
   getTrialVideo: (id: string | number) => `/videos/trialvideos/${id}.mp4`,
 };

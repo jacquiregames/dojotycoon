@@ -259,7 +259,7 @@
 .trial-bonus-sidebar {
   position: absolute;
   right: 2rem;
-  top: 70%;
+  bottom: 2.8%;
   transform: translateY(-50%);
   display: flex;
   flex-direction: column;
@@ -270,6 +270,7 @@
   border-radius: 1rem;
   border: 4px solid rgba(255, 255, 255, 1); 
   min-width: 28vw;
+  max-width: 30vw;
 }
 
 .bonus-dojo-name {
@@ -281,9 +282,23 @@
   text-transform: uppercase;
   text-shadow: 0 0 4px #000, 0 0 8px #000, 0 0 16px var(--dojo-color, #fff);
   text-align: center;
-  margin-bottom: 0.5rem; 
+  margin-bottom: 0rem; 
   border-bottom: 2px solid var(--dojo-color, #fff);
   line-height: 1;
+}
+ 
+.bonus-description {
+  font-family: var(--font-julee);
+  font-size: 2.2em;
+  font-weight: 700;
+  color: #fff; /* Distinct Gold Color to feel like a "Bonus" */
+  text-align: center;
+  margin-top: -0.8rem; /* Tucks it slightly closer to the title above */
+  margin-bottom: 0.8rem;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+  line-height: 1.2;
+  letter-spacing: 0.05em;
+  max-width: 24vw;
 }
 
 .bonus-player-list {

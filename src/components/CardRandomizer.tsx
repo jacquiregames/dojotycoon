@@ -2,7 +2,9 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import type { Player, GameState, DojoName, RandomizerMode, RandomizerResult, RandomizerExtraProps } from '../types';
-import { WAGER_OPTIONS, GREEN_PRIZE_OPTIONS, RED_PRIZE_OPTIONS, TRIAL_OPTIONS, ROUND_TRIAL_MAP_10R_3P, ROUND_TRIAL_MAP_15R_3P, ROUND_TRIAL_MAP_10R_4P, ROUND_TRIAL_MAP_15R_4P } from '../config/cardDecks';
+import { WAGER_OPTIONS, GREEN_PRIZE_OPTIONS, RED_PRIZE_OPTIONS } from '../config/standardDecks';
+import { TRIAL_OPTIONS } from '../config/trials';
+import { ROUND_TRIAL_MAP_10R_3P, ROUND_TRIAL_MAP_15R_3P, ROUND_TRIAL_MAP_10R_4P, ROUND_TRIAL_MAP_15R_4P } from '../config/trialMaps';
 import { useKeyRouterLayer, KEY_LAYERS } from '../hooks/useKeyRouterLayer';
 import { useRandomizerAudio } from '../hooks/useRandomizerAudio';
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
@@ -21,6 +23,7 @@ const modeMap: Record<string, RandomizerMode> = {
   '3v1': '3v1',
   'tournament': 'tourny',
   'boss': 'boss',
+  'evenoddboss': 'evenoddboss',
   'keno': 'keno',
   'roulette': 'roulette',
   '2v1': '2v1',
@@ -36,7 +39,7 @@ interface CardRandomizerProps {
   gameState?: GameState;
   totalRounds: number;
   extraProps?: RandomizerExtraProps;
-  drawnCards?: { wager: string[]; 'prize-green': string[]; 'prize-red': string[]; trials: number[]; };
+  drawnCards?: { wager: string[]; 'prize-green': string[]; 'prize-red': string[]; trials: (string | number)[]; };
   prizeVideoIndices?: { green: number; red: number };
   setPrizeVideoIndices?: React.Dispatch<React.SetStateAction<{ green: number; red: number }>>;
   bossVideoFinished?: boolean;
@@ -59,6 +62,7 @@ export interface Card {
     dojo?: DojoName;
     trialType?: string;
     bossHealth?: number;
+    bonusText?: string; 
   };
   shufflePosition: { x: number; y: number; rotate: number };
 }
@@ -129,7 +133,16 @@ export default function CardRandomizer({ allPlayers, mode, onClose, onSubMode, i
       let available = roundOptions.filter(o => !(drawnCards?.trials || []).includes(o.id));
       if (available.length === 0) available = roundOptions; 
       
-      baseCards = available.map(o => ({ itemIdentifier: o.id, content: { type: 'prize', prizeValue: o.value, prizeImage: o.image, dojo: o.dojo, trialType: o.trialType, bossHealth: o.bossHealth } }));
+      baseCards = available.map(o => {
+        let bHealth = o.bossHealth; // Standard trial compatibility
+        if (o.bossHealth3p && allPlayers.length === 3) bHealth = o.bossHealth3p;
+        if (o.bossHealth4p && allPlayers.length >= 4) bHealth = o.bossHealth4p;
+        
+        return { 
+          itemIdentifier: o.id, 
+          content: { type: 'prize', prizeValue: o.value, prizeImage: o.image, dojo: o.dojo, trialType: o.trialType, bossHealth: bHealth, bonusText: o.bonusText } 
+        };
+      });
     }
     else {
       baseCards = allPlayers.map(p => ({ itemIdentifier: p.name, content: { type: 'player', player: p } }));
@@ -150,16 +163,17 @@ export default function CardRandomizer({ allPlayers, mode, onClose, onSubMode, i
   const exampleImage = useMemo(() => {
     if (step !== 'result' || mode !== 'trials' || !revealedCard) return null;
     const id = Number(revealedCard.itemIdentifier);
+    if (Number.isNaN(id)) return null; // Bosses (B1, etc) don't have example images
     if ([20, 21, 22, 23, 24, 25].includes(id)) return '/images/example/20_21_22_23_24_25.png';
-    if ([44, 46, 48].includes(id)) return '/images/example/44_46_48.png';
-    if ([45, 47, 49].includes(id)) return '/images/example/45_47_49.png';
-    if (id === 50) return '/images/example/50.png';
-    if (id === 51) return '/images/example/51.png';
-    if (id === 53) return '/images/example/53.png';
-    if (id === 55) return '/images/example/55.png';
-    if (id === 58) return '/images/example/58.png';
-    if (id === 60) return '/images/example/60.png';
-    if (id === 62) return '/images/example/62.png';
+    if ([38, 40, 42].includes(id)) return '/images/example/38_40_42.png';
+    if ([39, 41, 43].includes(id)) return '/images/example/39_41_43.png';
+    if (id === 44) return '/images/example/44.png';
+    if (id === 45) return '/images/example/45.png';
+    if (id === 47) return '/images/example/47.png';
+    if (id === 49) return '/images/example/49.png';
+    if (id === 52) return '/images/example/52.png';
+    if (id === 54) return '/images/example/54.png';
+    if (id === 56) return '/images/example/56.png';
     return null;
   }, [step, mode, revealedCard]);
 
@@ -266,8 +280,8 @@ export default function CardRandomizer({ allPlayers, mode, onClose, onSubMode, i
         setTimeout(() => {
           if (!isClosingRef.current) {
             let extra: RandomizerExtraProps | undefined;
-            if (targetMode === 'boss') {
-              extra = { bossHealth: revealedCard.content.bossHealth ?? 200, bossId: revealedCard.itemIdentifier as number };
+            if (targetMode === 'boss' || targetMode === 'evenoddboss') {
+              extra = { bossHealth: revealedCard.content.bossHealth ?? 200, bossId: revealedCard.itemIdentifier };
             } else if (typeof revealedCard.content.bossHealth === 'number') {
               extra = revealedCard.content.bossHealth;
             }

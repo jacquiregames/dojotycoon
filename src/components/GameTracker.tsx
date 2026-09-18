@@ -16,6 +16,7 @@ import GlobalControls from './GlobalControls';
 import InvestmentTable from './InvestmentTable';
 import RulesPopups from './RulesPopups';
 import type { RulesPopupsHandle } from './RulesPopups';
+import Toasty from './Toasty';
 import './GameTracker.css';
 
 interface GameTrackerProps {
@@ -31,7 +32,7 @@ interface ModeStackItem {
   extraProps?: RandomizerExtraProps;
 }
 
-function getBossProps(extraProps?: RandomizerExtraProps): { bossHealth: number; bossId?: number } {
+function getBossProps(extraProps?: RandomizerExtraProps): { bossHealth: number; bossId?: string | number } {
   if (typeof extraProps === 'number') return { bossHealth: extraProps };
   return { bossHealth: extraProps?.bossHealth ?? 200, bossId: extraProps?.bossId };
 }
@@ -163,9 +164,9 @@ export default function GameTracker({ initialPlayers, totalRounds }: GameTracker
 
         if (item.mode === 'jackpot') return <ProgressiveJackpot key={item.id} onClose={handleRandomizerClose} isActive={isActive} />;
         if (item.mode === 'keno' || item.mode === 'roulette') return <KenoRoulette key={item.id} mode={item.mode} onClose={handleRandomizerClose} isActive={isActive} />;
-        if (item.mode === 'boss') {
+        if (item.mode === 'boss' || item.mode === 'evenoddboss') {
           const bossProps = getBossProps(item.extraProps);
-          return <BossDamageTracker key={item.id} players={item.players} initialHealth={bossProps.bossHealth} bossId={bossProps.bossId} onClose={handleRandomizerClose} isActive={isActive} onBossVideoEnded={() => setBossVideoFinished(true)} />;
+          return <BossDamageTracker key={item.id} players={item.players} bossType={item.mode} initialHealth={bossProps.bossHealth} bossId={bossProps.bossId} onClose={handleRandomizerClose} isActive={isActive} onBossVideoEnded={() => setBossVideoFinished(true)} />;
         }
         return <CardRandomizer key={item.id} allPlayers={item.players} mode={item.mode} onClose={handleRandomizerClose} onSubMode={(mode, extraProps) => openRandomizer(mode, item.players, undefined, extraProps)} isActive={isActive} gameState={state} extraProps={item.extraProps} drawnCards={drawnCards} totalRounds={totalRounds} prizeVideoIndices={prizeVideoIndices} setPrizeVideoIndices={setPrizeVideoIndices} bossVideoFinished={bossVideoFinished} />;
       })}
@@ -208,6 +209,8 @@ export default function GameTracker({ initialPlayers, totalRounds }: GameTracker
           style={{ top: 0, left: 0, width: "100%", height: "100%", position: "fixed", zIndex: 2, filter: "brightness(1.2)", pointerEvents: "none" }}
         />
       )}
+      
+      <Toasty />
     </div>
   );
 }
