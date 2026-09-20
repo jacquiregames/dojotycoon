@@ -285,11 +285,3 @@
   transform: translateY(2px) scale(0.98);
 }
 
-
-/* Responsive adjustments */
-@media (max-width: 600px) {
-  .arrow-needle { width: 30px; }
-  .arrow-shaft { width: 11px; }
-  .arrow-head { width: 36px; height: 44px; }
-  .spin-btn { padding: 14px 32px; font-size: 18px; }
-}

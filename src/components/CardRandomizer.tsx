@@ -18,6 +18,15 @@ import './CardRandomizer.css';
 const GREEN_VIDEOS = ['prize-green1.mp4', 'prize-green2.mp4', 'prize-green3.mp4'];
 const RED_VIDEOS = ['prize-red1.mp4', 'prize-red2.mp4', 'prize-red3.mp4'];
 
+// Maps a trial id to its example image. Several ids share one illustration
+// (e.g. 20-25 are all variations shown by a single combined image).
+const TRIAL_EXAMPLE_IMAGES: Record<number, string> = Object.fromEntries([
+  ...[20, 21, 22, 23, 24, 25].map(id => [id, '/images/example/20_21_22_23_24_25.png']),
+  ...[38, 40, 42].map(id => [id, '/images/example/38_40_42.png']),
+  ...[39, 41, 43].map(id => [id, '/images/example/39_41_43.png']),
+  ...[44, 45, 47, 49, 52, 54, 56].map(id => [id, `/images/example/${id}.png`]),
+]);
+
 const modeMap: Record<string, RandomizerMode> = {
   '2v2': '2v2',
   '3v1': '3v1',
@@ -28,6 +37,15 @@ const modeMap: Record<string, RandomizerMode> = {
   'roulette': 'roulette',
   '2v1': '2v1',
   'jackpot': 'jackpot'
+};
+
+// Which "vs" badge position(s) to show over the result cards, per mode.
+// 'tourny' shows two badges (one per bracket pairing).
+const VS_IMAGE_POSITIONS: Partial<Record<RandomizerMode, string[]>> = {
+  tourny: ['vs-image-12', 'vs-image-34'],
+  '2v2': ['vs-image-23'],
+  '2v1': ['vs-image-2v1'],
+  '3v1': ['vs-image-34'],
 };
 
 interface CardRandomizerProps {
@@ -164,17 +182,7 @@ export default function CardRandomizer({ allPlayers, mode, onClose, onSubMode, i
     if (step !== 'result' || mode !== 'trials' || !revealedCard) return null;
     const id = Number(revealedCard.itemIdentifier);
     if (Number.isNaN(id)) return null; // Bosses (B1, etc) don't have example images
-    if ([20, 21, 22, 23, 24, 25].includes(id)) return '/images/example/20_21_22_23_24_25.png';
-    if ([38, 40, 42].includes(id)) return '/images/example/38_40_42.png';
-    if ([39, 41, 43].includes(id)) return '/images/example/39_41_43.png';
-    if (id === 44) return '/images/example/44.png';
-    if (id === 45) return '/images/example/45.png';
-    if (id === 47) return '/images/example/47.png';
-    if (id === 49) return '/images/example/49.png';
-    if (id === 52) return '/images/example/52.png';
-    if (id === 54) return '/images/example/54.png';
-    if (id === 56) return '/images/example/56.png';
-    return null;
+    return TRIAL_EXAMPLE_IMAGES[id] ?? null;
   }, [step, mode, revealedCard]);
 
   useEffect(() => {
@@ -364,15 +372,15 @@ export default function CardRandomizer({ allPlayers, mode, onClose, onSubMode, i
           })}
           
           <AnimatePresence>
-            {step === 'result' && (
-              <>
-                {mode === 'tourny' && <motion.img src={ASSETS.IMAGES.VS} alt="vs" className="vs-image vs-image-12" {...vsImageAnimationProps} />}
-                {mode === '2v2' && <motion.img src={ASSETS.IMAGES.VS} alt="vs" className="vs-image vs-image-23" {...vsImageAnimationProps} />}
-                {mode === '2v1' && <motion.img src={ASSETS.IMAGES.VS} alt="vs" className="vs-image vs-image-2v1" {...vsImageAnimationProps} />}                  
-                {mode === '3v1' && <motion.img src={ASSETS.IMAGES.VS} alt="vs" className="vs-image vs-image-34" {...vsImageAnimationProps} />}
-                {mode === 'tourny' && <motion.img src={ASSETS.IMAGES.VS} alt="vs" className="vs-image vs-image-34" {...vsImageAnimationProps} />}
-              </>
-            )}
+            {step === 'result' && (VS_IMAGE_POSITIONS[mode] ?? []).map(positionClass => (
+              <motion.img
+                key={positionClass}
+                src={ASSETS.IMAGES.VS}
+                alt="vs"
+                className={`vs-image ${positionClass}`}
+                {...vsImageAnimationProps}
+              />
+            ))}
           </AnimatePresence>
         </div>
 

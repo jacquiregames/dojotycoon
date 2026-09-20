@@ -7,13 +7,20 @@
   --muted: #89a2b8;
   --dim: #52677d;
   --line: rgba(102, 237, 255, 0.22);
-  --line-hot: rgba(255, 62, 139, 0.55);
+  --line-hot: rgba(var(--pink-rgb), 0.55);
   --cyan: #59f1ff;
-  --cyan-soft: rgba(89, 241, 255, 0.18);
+  --cyan-soft: rgba(var(--cyan-rgb), 0.18);
   --violet: #8d5cff;
   --pink: #ff3e8b;
   --green: #77ff98;
   --amber: #ffd166;
+  --cyan-rgb: 89, 241, 255;
+  --pink-rgb: 255, 62, 139;
+  --green-rgb: 119, 255, 152;
+  --amber-rgb: 255, 209, 102;
+  --violet-rgb: 141, 92, 255;
+  --thead-ink: #c7fbff;
+  --hover-ink: #04111c;
   --shadow: rgba(0, 0, 0, 0.55);
 
   position: fixed;
@@ -31,11 +38,10 @@
 
 /* --- Final Boss theme ---
    Recolors the whole tracker from its default cyan palette into the red
-   hue used by the standalone Final Boss app. Most of the file is already
-   built on the CSS variables below, so overriding them does most of the
-   work; the handful of rules further down that hardcode the cyan/pink/
-   green/amber rgba() values directly get a matching `.final-boss`
-   override right next to them so nothing is left cyan. */
+   hue used by the standalone Final Boss app. Every color in this file is
+   driven by the variables below (including the "-rgb" ones, used inside
+   rgba() so alpha can still vary per rule), so overriding them here is
+   the only thing this theme needs to do. */
 .boss-damage-tracker-overlay.final-boss {
   --line: rgba(255, 45, 85, 0.28);
   --line-hot: rgba(255, 106, 61, 0.6);
@@ -45,6 +51,13 @@
   --pink: #ff6a3d;
   --green: #ff8fa3;
   --amber: #ffb84d;
+  --cyan-rgb: 255, 45, 85;
+  --pink-rgb: 255, 106, 61;
+  --green-rgb: 255, 143, 163;
+  --amber-rgb: 255, 184, 77;
+  --violet-rgb: 179, 18, 58;
+  --thead-ink: #ffe1e6;
+  --hover-ink: #1c0408;
 
   /* The mid-game (default) variant is a fixed, full-viewport overlay -
      the Final Boss variant instead lives inside FinalBossSequence's
@@ -104,8 +117,8 @@
   z-index: 0;
   opacity: 0.34;
   background-image:
-    linear-gradient(rgba(89, 241, 255, 0.1) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(89, 241, 255, 0.1) 1px, transparent 1px);
+    linear-gradient(rgba(var(--cyan-rgb), 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(var(--cyan-rgb), 0.1) 1px, transparent 1px);
   background-size: 54px 54px;
   mask-image: radial-gradient(circle at center, black 0%, transparent 78%);
   animation: gridDrift 18s linear infinite;
@@ -115,8 +128,8 @@
   z-index: 0;
   opacity: 0.55;
   background:
-    radial-gradient(circle at 28% 22%, rgba(89, 241, 255, 0.13), transparent 22rem),
-    radial-gradient(circle at 80% 66%, rgba(255, 62, 139, 0.12), transparent 24rem);
+    radial-gradient(circle at 28% 22%, rgba(var(--cyan-rgb), 0.13), transparent 22rem),
+    radial-gradient(circle at 80% 66%, rgba(var(--pink-rgb), 0.12), transparent 24rem);
   animation: ambientGlow 8s ease-in-out infinite alternate;
 }
 
@@ -169,7 +182,7 @@
   border-radius: inherit;
   pointer-events: none;
   background:
-    linear-gradient(135deg, rgba(89, 241, 255, 0.18), transparent 34%, rgba(255, 62, 139, 0.1)),
+    linear-gradient(135deg, rgba(var(--cyan-rgb), 0.18), transparent 34%, rgba(var(--pink-rgb), 0.1)),
     radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.08), transparent 26%);
 }
 
@@ -191,10 +204,10 @@
   gap: 1px;
   padding: 22px 30px;
   text-align: center;
-  border-color: rgba(89, 241, 255, 0.34);
+  border-color: rgba(var(--cyan-rgb), 0.34);
   box-shadow:
     0 24px 70px rgba(0, 0, 0, 0.52),
-    0 0 46px rgba(89, 241, 255, 0.12),
+    0 0 46px rgba(var(--cyan-rgb), 0.12),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
@@ -216,18 +229,18 @@
   letter-spacing: 0.04em;
   line-height: 1;
   text-shadow:
-    0 0 12px rgba(89, 241, 255, 0.65),
-    0 0 36px rgba(89, 241, 255, 0.28);
+    0 0 12px rgba(var(--cyan-rgb), 0.65),
+    0 0 36px rgba(var(--cyan-rgb), 0.28);
 }
 
 .health-warning h1 {
   color: var(--amber);
-  text-shadow: 0 0 18px rgba(255, 209, 102, 0.55);
+  text-shadow: 0 0 18px rgba(var(--amber-rgb), 0.55);
 }
 
 .health-critical h1 {
   color: var(--pink);
-  text-shadow: 0 0 18px rgba(255, 62, 139, 0.72);
+  text-shadow: 0 0 18px rgba(var(--pink-rgb), 0.72);
 }
 
 .health-critical {
@@ -250,7 +263,7 @@
   min-width: 0;
   border-radius: inherit;
   background: linear-gradient(90deg, var(--green), var(--cyan));
-  box-shadow: 0 0 18px rgba(89, 241, 255, 0.45);
+  box-shadow: 0 0 18px rgba(var(--cyan-rgb), 0.45);
   transition: width 380ms ease, background 220ms ease;
 }
 
@@ -265,12 +278,12 @@
 
 .health-warning .health-meter-fill {
   background: linear-gradient(90deg, var(--amber), #ff8a3d);
-  box-shadow: 0 0 18px rgba(255, 209, 102, 0.42);
+  box-shadow: 0 0 18px rgba(var(--amber-rgb), 0.42);
 }
 
 .health-critical .health-meter-fill {
   background: linear-gradient(90deg, var(--pink), #ff6a3d);
-  box-shadow: 0 0 20px rgba(255, 62, 139, 0.55);
+  box-shadow: 0 0 20px rgba(var(--pink-rgb), 0.55);
 }
 
 /* =========================================
@@ -284,10 +297,10 @@
   justify-content: center;
   width: 100%;
   padding: 22px 30px;
-  border-color: rgba(89, 241, 255, 0.34);
+  border-color: rgba(var(--cyan-rgb), 0.34);
   box-shadow:
     0 24px 70px rgba(0, 0, 0, 0.52),
-    0 0 46px rgba(89, 241, 255, 0.12),
+    0 0 46px rgba(var(--cyan-rgb), 0.12),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
@@ -331,12 +344,12 @@
   font-weight: 950;
   letter-spacing: 0.04em;
   line-height: 1;
-  text-shadow: 0 0 12px rgba(255, 62, 139, 0.65), 0 0 36px rgba(255, 62, 139, 0.28);
+  text-shadow: 0 0 12px rgba(var(--pink-rgb), 0.65), 0 0 36px rgba(var(--pink-rgb), 0.28);
 }
 
 .health-track-even .health-value {
   color: var(--cyan);
-  text-shadow: 0 0 12px rgba(89, 241, 255, 0.65), 0 0 36px rgba(89, 241, 255, 0.28);
+  text-shadow: 0 0 12px rgba(var(--cyan-rgb), 0.65), 0 0 36px rgba(var(--cyan-rgb), 0.28);
 }
 
 .health-track .health-meter {
@@ -353,21 +366,21 @@
   height: 100%;
   border-radius: inherit;
   background: linear-gradient(90deg, #ff3e8b, #ff6a3d);
-  box-shadow: 0 0 18px rgba(255, 62, 139, 0.45);
+  box-shadow: 0 0 18px rgba(var(--pink-rgb), 0.45);
   transition: width 380ms ease;
 }
 
 .health-track-even .health-meter-fill {
   background: linear-gradient(90deg, var(--green), var(--cyan));
-  box-shadow: 0 0 18px rgba(89, 241, 255, 0.45);
+  box-shadow: 0 0 18px rgba(var(--cyan-rgb), 0.45);
 }
 
 .health-track.is-critical .health-meter-fill {
-  box-shadow: 0 0 20px rgba(255, 62, 139, 0.7);
+  box-shadow: 0 0 20px rgba(var(--pink-rgb), 0.7);
 }
 
 .health-track-even.is-critical .health-meter-fill {
-  box-shadow: 0 0 20px rgba(89, 241, 255, 0.7);
+  box-shadow: 0 0 20px rgba(var(--cyan-rgb), 0.7);
 }
 
 
@@ -393,8 +406,8 @@
   min-width: 74px;
   padding: 14px 16px;
   text-align: center;
-  border-right: 1px solid rgba(89, 241, 255, 0.14);
-  border-bottom: 1px solid rgba(89, 241, 255, 0.14);
+  border-right: 1px solid rgba(var(--cyan-rgb), 0.14);
+  border-bottom: 1px solid rgba(var(--cyan-rgb), 0.14);
   font-size: 1.5rem;
 }
 
@@ -408,15 +421,15 @@
 }
 
 .damage-table thead th {
-  color: #c7fbff;
+  color: var(--thead-ink);
   background:
-    linear-gradient(180deg, rgba(89, 241, 255, 0.2), rgba(89, 241, 255, 0.08)),
+    linear-gradient(180deg, rgba(var(--cyan-rgb), 0.2), rgba(var(--cyan-rgb), 0.08)),
     rgba(10, 26, 58, 0.92);
   font-size: 0.78rem;
   font-weight: 900;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  text-shadow: 0 0 12px rgba(89, 241, 255, 0.36);
+  text-shadow: 0 0 12px rgba(var(--cyan-rgb), 0.36);
 }
 
 .damage-table tbody tr {
@@ -432,12 +445,12 @@
 }
 
 .damage-table tbody tr:hover {
-  background: rgba(89, 241, 255, 0.08);
+  background: rgba(var(--cyan-rgb), 0.08);
 }
 
 .damage-table tbody tr:last-child {
   background:
-    linear-gradient(90deg, rgba(255, 209, 102, 0.14), rgba(141, 92, 255, 0.12));
+    linear-gradient(90deg, rgba(var(--amber-rgb), 0.14), rgba(var(--violet-rgb), 0.12));
 }
 
 .damage-table .player-name,
@@ -454,60 +467,28 @@
   color: #ffffff;
   font-weight: 850;
   background:
-    radial-gradient(circle at center, rgba(89, 241, 255, 0.34), rgba(89, 241, 255, 0.12) 64%, transparent),
-    rgba(89, 241, 255, 0.12);
-  box-shadow: inset 0 0 0 1px rgba(89, 241, 255, 0.56), inset 0 0 26px rgba(89, 241, 255, 0.22);
+    radial-gradient(circle at center, rgba(var(--cyan-rgb), 0.34), rgba(var(--cyan-rgb), 0.12) 64%, transparent),
+    rgba(var(--cyan-rgb), 0.12);
+  box-shadow: inset 0 0 0 1px rgba(var(--cyan-rgb), 0.56), inset 0 0 26px rgba(var(--cyan-rgb), 0.22);
   animation: activeCellPulse 1.65s ease-in-out infinite;
 }
 
 .damage-table td.filled-cell {
   color: var(--green);
   font-weight: 900;
-  text-shadow: 0 0 14px rgba(119, 255, 152, 0.32);
+  text-shadow: 0 0 14px rgba(var(--green-rgb), 0.32);
 }
 
 .damage-table td.total-filled {
   color: var(--amber);
   font-weight: 950;
-  text-shadow: 0 0 16px rgba(255, 209, 102, 0.35);
+  text-shadow: 0 0 16px rgba(var(--amber-rgb), 0.35);
 }
 
 .entry-preview {
   color: var(--cyan);
   font-weight: 950;
-  text-shadow: 0 0 14px rgba(89, 241, 255, 0.55);
-}
-
-/* --- New Footer Tracker Styles --- */
-
-.tracker-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px solid rgba(89, 241, 255, 0.14);
-}
-
-.tracker-hint {
-  color: var(--muted);
-  font-size: 0.85rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.tracker-status {
-  color: var(--muted);
-  font-size: 0.85rem;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-.tracker-status span {
-  color: var(--cyan);
-  text-shadow: 0 0 12px rgba(89, 241, 255, 0.45);
+  text-shadow: 0 0 14px rgba(var(--cyan-rgb), 0.55);
 }
 
 /* --- Modal Styles --- */
@@ -521,7 +502,7 @@
   justify-content: center;
   padding: 24px;
   background:
-    radial-gradient(circle at center, rgba(89, 241, 255, 0.12), transparent 28rem),
+    radial-gradient(circle at center, rgba(var(--cyan-rgb), 0.12), transparent 28rem),
     rgba(1, 3, 10, 0.0);              
 }
 
@@ -542,13 +523,13 @@
 }
 
 .modal-box.success {
-  border-color: rgba(119, 255, 152, 0.62);
-  box-shadow: 0 34px 90px rgba(0, 0, 0, 0.64), 0 0 54px rgba(119, 255, 152, 0.16);
+  border-color: rgba(var(--green-rgb), 0.62);
+  box-shadow: 0 34px 90px rgba(0, 0, 0, 0.64), 0 0 54px rgba(var(--green-rgb), 0.16);
 }
 
 .modal-box.fail {
-  border-color: rgba(255, 62, 139, 0.7);
-  box-shadow: 0 34px 90px rgba(0, 0, 0, 0.64), 0 0 62px rgba(255, 62, 139, 0.2);
+  border-color: rgba(var(--pink-rgb), 0.7);
+  box-shadow: 0 34px 90px rgba(0, 0, 0, 0.64), 0 0 62px rgba(var(--pink-rgb), 0.2);
 }
 
 .modal-title {
@@ -561,34 +542,23 @@
 
 .modal-box.success .modal-title {
   color: var(--green);
-  text-shadow: 0 0 28px rgba(119, 255, 152, 0.58);
+  text-shadow: 0 0 28px rgba(var(--green-rgb), 0.58);
 }
 
 .modal-box.fail .modal-title {
   color: var(--pink);
-  text-shadow: 0 0 28px rgba(255, 62, 139, 0.65);
-}
-
-.modal-subtitle {
-  color: var(--muted);
-  font-size: 1rem;
-}
-
-.modal-hint {
-  color: var(--dim);
-  font-size: 0.82rem;
-  letter-spacing: 0.06em;
+  text-shadow: 0 0 28px rgba(var(--pink-rgb), 0.65);
 }
 
 .modal-reset-btn {
   margin-top: 6px;
   padding: 13px 34px;
   cursor: pointer;
-  border: 1px solid rgba(89, 241, 255, 0.56);
+  border: 1px solid rgba(var(--cyan-rgb), 0.56);
   border-radius: 999px;
   color: var(--cyan);
   background: rgba(11, 24, 54, 0.9);
-  box-shadow: 0 0 22px rgba(89, 241, 255, 0.12);
+  box-shadow: 0 0 22px rgba(var(--cyan-rgb), 0.12);
   font-size: 0.94rem;
   font-weight: 900;
   letter-spacing: 0.12em;
@@ -597,9 +567,9 @@
 
 .modal-reset-btn:hover {
   transform: translateY(-1px);
-  color: #04111c;
+  color: var(--hover-ink);
   background: var(--cyan);
-  box-shadow: 0 0 28px rgba(89, 241, 255, 0.34);
+  box-shadow: 0 0 28px rgba(var(--cyan-rgb), 0.34);
 }
 
 @keyframes gridDrift {
@@ -628,173 +598,11 @@
 }
 
 @keyframes dangerPulse {
-  0%, 100% { box-shadow: 0 24px 70px rgba(0, 0, 0, 0.52), 0 0 38px rgba(255, 62, 139, 0.12); }
-  50% { box-shadow: 0 24px 70px rgba(0, 0, 0, 0.52), 0 0 58px rgba(255, 62, 139, 0.32); }
+  0%, 100% { box-shadow: 0 24px 70px rgba(0, 0, 0, 0.52), 0 0 38px rgba(var(--pink-rgb), 0.12); }
+  50% { box-shadow: 0 24px 70px rgba(0, 0, 0, 0.52), 0 0 58px rgba(var(--pink-rgb), 0.32); }
 }
 
 @keyframes activeCellPulse {
-  0%, 100% { box-shadow: inset 0 0 0 1px rgba(89, 241, 255, 0.46), inset 0 0 22px rgba(89, 241, 255, 0.16); }
-  50% { box-shadow: inset 0 0 0 1px rgba(89, 241, 255, 0.78), inset 0 0 34px rgba(89, 241, 255, 0.28); }
-}
-
-/* --- Final Boss theme, part 2 ---
-   Everything above this point is already re-tinted by the CSS variable
-   overrides near the top of this file. The rules below cover the handful
-   of places that hardcode rgba() literals instead of using those
-   variables, mapped 1:1 onto the red palette:
-     cyan   rgba(89,241,255)  -> rgba(255,45,85)   (--cyan)
-     hot    rgba(255,62,139)  -> rgba(255,106,61)  (--pink)
-     green  rgba(119,255,152) -> rgba(255,143,163) (--green)
-     amber  rgba(255,209,102) -> rgba(255,184,77)  (--amber)
-     violet rgba(141,92,255)  -> rgba(179,18,58)   (--violet) */
-
-.boss-damage-tracker-overlay.final-boss::before {
-  background-image:
-    linear-gradient(rgba(255, 45, 85, 0.1) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 45, 85, 0.1) 1px, transparent 1px);
-}
-
-.boss-damage-tracker-overlay.final-boss::after {
-  background:
-    radial-gradient(circle at 28% 22%, rgba(255, 45, 85, 0.13), transparent 22rem),
-    radial-gradient(circle at 80% 66%, rgba(255, 106, 61, 0.12), transparent 24rem);
-}
-
-.final-boss .boss-container::before {
-  background:
-    linear-gradient(135deg, rgba(255, 45, 85, 0.18), transparent 34%, rgba(255, 106, 61, 0.1)),
-    radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.08), transparent 26%);
-}
-
-.final-boss .health-container {
-  border-color: rgba(255, 45, 85, 0.34);
-  box-shadow:
-    0 24px 70px rgba(0, 0, 0, 0.52),
-    0 0 46px rgba(255, 45, 85, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-}
-
-.final-boss .health-container h1 {
-  text-shadow:
-    0 0 12px rgba(255, 45, 85, 0.65),
-    0 0 36px rgba(255, 45, 85, 0.28);
-}
-
-.final-boss .health-warning h1 {
-  text-shadow: 0 0 18px rgba(255, 184, 77, 0.55);
-}
-
-.final-boss .health-critical h1 {
-  text-shadow: 0 0 18px rgba(255, 106, 61, 0.72);
-}
-
-.final-boss .health-meter-fill {
-  box-shadow: 0 0 18px rgba(255, 45, 85, 0.45);
-}
-
-.final-boss .health-warning .health-meter-fill {
-  box-shadow: 0 0 18px rgba(255, 184, 77, 0.42);
-}
-
-.final-boss .health-critical .health-meter-fill {
-  box-shadow: 0 0 20px rgba(255, 106, 61, 0.55);
-}
-
-.final-boss .damage-table th,
-.final-boss .damage-table td {
-  border-right: 1px solid rgba(255, 45, 85, 0.14);
-  border-bottom: 1px solid rgba(255, 45, 85, 0.14);
-}
-
-.final-boss .damage-table thead th {
-  color: #ffe1e6;
-  background:
-    linear-gradient(180deg, rgba(255, 45, 85, 0.2), rgba(255, 45, 85, 0.08)),
-    rgba(46, 10, 20, 0.92);
-  text-shadow: 0 0 12px rgba(255, 45, 85, 0.36);
-}
-
-.final-boss .damage-table tbody tr:hover {
-  background: rgba(255, 45, 85, 0.08);
-}
-
-.final-boss .damage-table tbody tr:last-child {
-  background:
-    linear-gradient(90deg, rgba(255, 184, 77, 0.14), rgba(179, 18, 58, 0.12));
-}
-
-.final-boss .damage-table td.active-cell {
-  background:
-    radial-gradient(circle at center, rgba(255, 45, 85, 0.34), rgba(255, 45, 85, 0.12) 64%, transparent),
-    rgba(255, 45, 85, 0.12);
-  box-shadow: inset 0 0 0 1px rgba(255, 45, 85, 0.56), inset 0 0 26px rgba(255, 45, 85, 0.22);
-  animation: activeCellPulseFinal 1.65s ease-in-out infinite;
-}
-
-.final-boss .damage-table td.filled-cell {
-  text-shadow: 0 0 14px rgba(255, 143, 163, 0.32);
-}
-
-.final-boss .damage-table td.total-filled {
-  text-shadow: 0 0 16px rgba(255, 184, 77, 0.35);
-}
-
-.final-boss .entry-preview {
-  text-shadow: 0 0 14px rgba(255, 45, 85, 0.55);
-}
-
-.final-boss .tracker-footer {
-  border-top: 1px solid rgba(255, 45, 85, 0.14);
-}
-
-.final-boss .tracker-status span {
-  text-shadow: 0 0 12px rgba(255, 45, 85, 0.45);
-}
-
-.final-boss .health-critical {
-  animation: dangerPulseFinal 1.15s ease-in-out infinite;
-}
-
-.final-boss .modal-overlay {
-  background:
-    radial-gradient(circle at center, rgba(255, 45, 85, 0.12), transparent 28rem),
-    rgba(1, 3, 10, 0.0);
-}
-
-.final-boss .modal-box.success {
-  border-color: rgba(255, 143, 163, 0.62);
-  box-shadow: 0 34px 90px rgba(0, 0, 0, 0.64), 0 0 54px rgba(255, 143, 163, 0.16);
-}
-
-.final-boss .modal-box.fail {
-  border-color: rgba(255, 106, 61, 0.7);
-  box-shadow: 0 34px 90px rgba(0, 0, 0, 0.64), 0 0 62px rgba(255, 106, 61, 0.2);
-}
-
-.final-boss .modal-box.success .modal-title {
-  text-shadow: 0 0 28px rgba(255, 143, 163, 0.58);
-}
-
-.final-boss .modal-box.fail .modal-title {
-  text-shadow: 0 0 28px rgba(255, 106, 61, 0.65);
-}
-
-.final-boss .modal-reset-btn {
-  border: 1px solid rgba(255, 45, 85, 0.56);
-  box-shadow: 0 0 22px rgba(255, 45, 85, 0.12);
-}
-
-.final-boss .modal-reset-btn:hover {
-  color: #1c0408;
-  box-shadow: 0 0 28px rgba(255, 45, 85, 0.34);
-}
-
-@keyframes dangerPulseFinal {
-  0%, 100% { box-shadow: 0 24px 70px rgba(0, 0, 0, 0.52), 0 0 38px rgba(255, 106, 61, 0.12); }
-  50% { box-shadow: 0 24px 70px rgba(0, 0, 0, 0.52), 0 0 58px rgba(255, 106, 61, 0.32); }
-}
-
-@keyframes activeCellPulseFinal {
-  0%, 100% { box-shadow: inset 0 0 0 1px rgba(255, 45, 85, 0.46), inset 0 0 22px rgba(255, 45, 85, 0.16); }
-  50% { box-shadow: inset 0 0 0 1px rgba(255, 45, 85, 0.78), inset 0 0 34px rgba(255, 45, 85, 0.28); }
+  0%, 100% { box-shadow: inset 0 0 0 1px rgba(var(--cyan-rgb), 0.46), inset 0 0 22px rgba(var(--cyan-rgb), 0.16); }
+  50% { box-shadow: inset 0 0 0 1px rgba(var(--cyan-rgb), 0.78), inset 0 0 34px rgba(var(--cyan-rgb), 0.28); }
 }

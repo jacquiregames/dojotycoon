@@ -199,9 +199,8 @@ export default function BossDamageTracker({ players, bossType = 'boss', initialH
 
   if (introPlaying && bossId) {
     return (
-      <div className={`boss-intro-overlay ${isFinal ? 'final-boss' : ''}`}>
-        <div className="boss-intro-video-container">
-          <video
+      <div className={`boss-intro-overlay ${isFinal ? 'final-boss' : ''} ${isEvenOdd ? 'evenodd' : ''}`}>
+        <div className="boss-intro-video-container">          <video
             ref={videoRef}
             src={`/videos/bosses/${bossId}.mp4`}
             autoPlay
